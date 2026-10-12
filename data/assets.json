@@ -1,0 +1,20 @@
+[
+  {"asset_id": "A001", "ip": "10.10.5.21", "hostname": "srv-core-app01", "application": "Core Banking",
+   "environment": "PROD", "segment": "APP", "dc": "DC-JKT", "edr": true, "pam": false, "va": true,
+   "operating_system": "Windows Server 2019", "ip_category": "internal"},
+  {"asset_id": "A002", "ip": "10.10.6.30", "hostname": "srv-core-db01", "application": "Core Banking",
+   "environment": "PROD", "segment": "DB", "dc": "DC-JKT", "edr": true, "pam": true, "va": true,
+   "operating_system": "Red Hat Enterprise Linux 8", "ip_category": "internal"},
+  {"asset_id": "A003", "ip": "172.16.1.10", "hostname": "srv-portal-web01", "application": "Customer Portal",
+   "environment": "PROD", "segment": "DMZ", "dc": "DC-SBY", "edr": false, "pam": false, "va": true,
+   "operating_system": "Ubuntu 20.04", "ip_category": "public-facing"},
+  {"asset_id": "A004", "ip": "10.20.1.15", "hostname": "srv-portal-uat01", "application": "Customer Portal",
+   "environment": "UAT", "segment": "APP", "dc": "DC-JKT", "edr": true, "pam": false, "va": true,
+   "operating_system": "Ubuntu 22.04", "ip_category": "internal"},
+  {"asset_id": "A005", "ip": "10.30.2.8", "hostname": "srv-hr-dev01", "application": "HR System",
+   "environment": "DEV", "segment": "APP", "dc": "DC-JKT", "edr": true, "pam": false, "va": false,
+   "operating_system": "Windows Server 2016", "ip_category": "internal"},
+  {"asset_id": "A006", "ip": "10.10.5.22", "hostname": "srv-core-app02", "application": "Core Banking",
+   "environment": "PROD", "segment": "APP", "dc": "DC-JKT", "edr": true, "pam": true, "va": true,
+   "operating_system": "Ubuntu 22.04", "ip_category": "internal"}
+]

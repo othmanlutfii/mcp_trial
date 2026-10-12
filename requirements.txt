@@ -1,0 +1,16 @@
+langchain>=0.3
+langchain-core
+langgraph
+chromadb
+
+# Provider model (pilih sesuai SECBOT_PROVIDER; paket lain boleh tidak dipasang)
+langchain-ollama
+langchain-google-genai
+langchain-deepseek
+
+# Knowledge base (RAG)
+langchain-chroma
+langchain-text-splitters
+
+# Baca API key dari file .env
+python-dotenv

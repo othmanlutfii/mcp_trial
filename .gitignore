@@ -1,0 +1,15 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Vector DB hasil ingest (dibangun ulang dengan `python ingest.py`)
+vectordb/
+
+# OS / editor
+.DS_Store
+.env

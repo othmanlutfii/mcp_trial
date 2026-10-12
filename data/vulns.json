@@ -1,0 +1,29 @@
+[
+  {"id": 1, "ip": "10.10.5.21", "dnsName": "srv-core-app01.corp.local", "operatingSystem": "Windows Server 2019",
+   "severity": "Critical", "score": 9.8, "lastSeen": "2026-10-05",
+   "vulnerabilities": [
+     {"cve": "CVE-2024-38063", "name": "Windows TCP/IP IPv6 RCE", "severity": "Critical", "cvss": 9.8, "solution": "Install KB5041578 atau lebih baru"},
+     {"cve": "CVE-2023-44487", "name": "HTTP/2 Rapid Reset DoS", "severity": "High", "cvss": 7.5, "solution": "Update IIS dan terapkan patch Oktober 2023"},
+     {"cve": "CVE-2022-26925", "name": "Windows LSA Spoofing", "severity": "High", "cvss": 8.1, "solution": "Install patch Mei 2022"}
+   ]},
+  {"id": 2, "ip": "10.10.6.30", "dnsName": "srv-core-db01.corp.local", "operatingSystem": "Red Hat Enterprise Linux 8",
+   "severity": "Medium", "score": 5.3, "lastSeen": "2026-10-05",
+   "vulnerabilities": [
+     {"cve": "CVE-2023-4911", "name": "glibc Looney Tunables LPE", "severity": "Medium", "cvss": 5.3, "solution": "yum update glibc lalu reboot"}
+   ]},
+  {"id": 3, "ip": "172.16.1.10", "dnsName": "srv-portal-web01.corp.local", "operatingSystem": "Ubuntu 20.04",
+   "severity": "Critical", "score": 9.8, "lastSeen": "2026-10-04",
+   "vulnerabilities": [
+     {"cve": "CVE-2024-6387", "name": "OpenSSH regreSSHion RCE", "severity": "Critical", "cvss": 8.1, "solution": "apt update && apt install openssh-server lalu restart sshd"},
+     {"cve": "CVE-2021-41773", "name": "Apache HTTP Server Path Traversal", "severity": "Critical", "cvss": 9.8, "solution": "Upgrade Apache ke 2.4.51 atau lebih baru"},
+     {"cve": "CVE-2023-38408", "name": "OpenSSH ssh-agent RCE", "severity": "High", "cvss": 7.5, "solution": "Upgrade OpenSSH ke 9.3p2"}
+   ]},
+  {"id": 4, "ip": "10.20.1.15", "dnsName": "srv-portal-uat01.corp.local", "operatingSystem": "Ubuntu 22.04",
+   "severity": "Low", "score": 3.1, "lastSeen": "2026-10-03",
+   "vulnerabilities": [
+     {"cve": "CVE-2023-5678", "name": "OpenSSL DH excessive time", "severity": "Low", "cvss": 3.1, "solution": "apt install --only-upgrade openssl"}
+   ]},
+   {"id": 5, "ip": "10.10.5.22", "dnsName": "srv-core-app02.corp.local", "operatingSystem": "Ubuntu 22.04",
+ "severity": "Low", "score": 3.1, "lastSeen": "2026-10-05",
+ "vulnerabilities": [{"cve": "CVE-2023-5678", "name": "OpenSSL DH excessive time", "severity": "Low", "cvss": 3.1, "solution": "apt install --only-upgrade openssl"}]}
+]
