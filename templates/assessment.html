@@ -6,7 +6,7 @@
 <section class="page-head">
   <p class="eyebrow">Access Review</p>
   <h1>Assessment Buka Perangkat</h1>
-  <p class="muted">Masukkan koneksi yang akan dibuka. Hasil dihitung dari data CMDB, vulnerability, dan kebijakan port.</p>
+  <p class="muted">Masukkan koneksi yang akan dibuka. Skor dihitung deterministik, lalu dianalisis oleh pipeline 3 agen AI yang sama dengan chatbot.</p>
 </section>
 
 <form method="post" class="card form-card" autocomplete="off">
@@ -24,8 +24,17 @@
       <input type="number" name="port" value="{{ form.port }}" placeholder="443" min="1" max="65535" required>
     </label>
   </div>
-  <button type="submit">Nilai Akses</button>
+  <button type="submit">Nilai Akses + Analisis AI</button>
 </form>
+
+<div id="loading" class="loading-overlay" hidden>
+  <div class="loading-box">
+    <span class="spinner" aria-hidden="true"></span>
+    <strong>AI sedang menganalisis…</strong>
+    <span class="muted">Assessment → Policy → Reviewer. Proses ini bisa memakan puluhan detik.</span>
+    <span class="muted" id="loading-elapsed">0 detik</span>
+  </div>
+</div>
 
 {% if errors %}
 <div class="alert alert-error" role="alert">
@@ -55,6 +64,27 @@
       <span class="chip chip-risk-{{ result.risk_level|lower }}">{{ result.risk_level }}</span>
     </div>
   </div>
+
+  {% if ai_answer %}
+  <div class="card ai-card">
+    <div class="ai-head">
+      <div>
+        <p class="eyebrow">Analisis AI</p>
+        <h2>Hasil Reviewer</h2>
+      </div>
+      <span class="chip">3 agen · {{ ai_elapsed|round(1) }} dtk</span>
+    </div>
+    <pre class="ai-answer">{{ ai_answer }}</pre>
+  </div>
+  {% endif %}
+
+  {% if ai_error %}
+  <div class="alert alert-error">
+    <strong>Analisis AI gagal</strong>
+    <p>{{ ai_error }}</p>
+    <p>Hasil deterministik di bawah tetap dapat digunakan.</p>
+  </div>
+  {% endif %}
 
   <div class="side-grid">
     {% for side in [result.source, result.destination] %}
@@ -137,4 +167,22 @@
   {% endif %}
 </section>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const assessmentForm = document.querySelector("form.form-card");
+  if (assessmentForm) {
+    assessmentForm.addEventListener("submit", () => {
+      document.getElementById("loading").hidden = false;
+      assessmentForm.querySelector("button[type=submit]").disabled = true;
+
+      const startedAt = Date.now();
+      const elapsed = document.getElementById("loading-elapsed");
+      setInterval(() => {
+        elapsed.textContent = `${Math.round((Date.now() - startedAt) / 1000)} detik`;
+      }, 1000);
+    });
+  }
+</script>
 {% endblock %}

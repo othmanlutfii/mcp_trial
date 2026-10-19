@@ -46,6 +46,11 @@ def _build_gemini(temperature: float):
     if not model.lower().startswith("gemini-3"):
         # Gemini 3 memakai fixed sampling: mengirim temperature hanya memunculkan warning.
         kwargs["temperature"] = temperature
+    else:
+        # Gemini 3 memakai thinking level (bukan thinking_budget). Saat THINKING=False
+        # pakai level rendah agar jawaban jauh lebih cepat; tanpa ini model memakai
+        # default yang bisa menambah puluhan detik per panggilan.
+        kwargs["thinking_level"] = "high" if config.THINKING else "low"
     if not config.THINKING and "2.5" in model:
         # 0 = tanpa thinking token (lebih cepat & hemat kuota free tier).
         # Gemini 3 tidak memakai thinking_budget, jadi dibiarkan ke default model.

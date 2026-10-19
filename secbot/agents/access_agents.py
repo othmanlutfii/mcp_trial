@@ -69,26 +69,41 @@ def _tool_json(messages: list, tool_name: str) -> dict | None:
     return None
 
 
-def review_access(src_ip: str, dst_ip: str, port: int, protocol: str = "tcp", verbose: bool = True) -> str:
+def review_access(
+    src_ip: str,
+    dst_ip: str,
+    port: int,
+    protocol: str = "tcp",
+    verbose: bool = True,
+    assessment: dict | None = None,
+) -> str:
     """Jalankan ketiga agen dan kembalikan teks keputusan akhir.
 
     ``verbose=True`` mencetak progres tiap tahap ke stdout. Bila Assessment Agent tidak
     memanggil tool-nya, ``assess_connection`` dipanggil langsung agar hasil tetap deterministik.
+
+    ``assessment`` boleh diisi hasil :func:`secbot.assessment.assess_connection_data`
+    yang sudah dihitung pemanggil. Tahap Assessment Agent dilewati karena datanya
+    identik, sehingga menghemat satu putaran LLM (dipakai UI web).
     """
     log = print if verbose else (lambda *a, **k: None)
     llm = _llm()
-    assess_agent = create_react_agent(llm, [assess_connection], prompt=ASSESS_PROMPT)
     policy_agent = create_react_agent(llm, [search_knowledge], prompt=POLICY_PROMPT)
 
     # Tahap 1: data assessment
-    log("[1/3] Assessment Agent: mengumpulkan data compliance, vuln, risiko...")
-    msgs = _run(assess_agent, f"Nilai akses: source {src_ip}, destination {dst_ip}, port {port}, protocol {protocol}")
-    data = _tool_json(msgs, "assess_connection")
-    if data is None:  # agen tidak memanggil tool -> panggil langsung agar tetap deterministik
-        log("      (agen tidak memanggil tool, memanggil langsung)")
-        data = assess_connection.invoke(
-            {"src_ip": src_ip, "dst_ip": dst_ip, "port": port, "protocol": protocol}
-        )
+    if assessment is None:
+        assess_agent = create_react_agent(llm, [assess_connection], prompt=ASSESS_PROMPT)
+        log("[1/3] Assessment Agent: mengumpulkan data compliance, vuln, risiko...")
+        msgs = _run(assess_agent, f"Nilai akses: source {src_ip}, destination {dst_ip}, port {port}, protocol {protocol}")
+        data = _tool_json(msgs, "assess_connection")
+        if data is None:  # agen tidak memanggil tool -> panggil langsung agar tetap deterministik
+            log("      (agen tidak memanggil tool, memanggil langsung)")
+            data = assess_connection.invoke(
+                {"src_ip": src_ip, "dst_ip": dst_ip, "port": port, "protocol": protocol}
+            )
+    else:
+        log("[1/3] Assessment Agent: memakai hasil deterministik...")
+        data = assessment
     if "error" in data:
         return f"Permintaan tidak dapat dinilai: {data['error']}"
 

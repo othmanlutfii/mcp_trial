@@ -16,6 +16,7 @@ Dua hal penting:
 """
 import json
 import threading
+from functools import lru_cache
 
 from langchain_chroma import Chroma
 
@@ -104,10 +105,13 @@ def index_problem() -> str | None:
     return None
 
 
+@lru_cache(maxsize=128)
 def search_documents(query: str, k: int = 3) -> list[dict]:
     """Ambil ``k`` potongan dokumen paling relevan dengan ``query``.
 
     Kembalikan daftar berisi ``sumber`` (nama file), ``bagian`` (heading), dan ``isi`` (teks).
+    Hasil di-cache per proses karena vector DB hanya dibaca; query yang sama (misalnya
+    pengecekan ulang koneksi yang sama) tidak perlu memanggil API embedding lagi.
     """
     hasil = get_vectorstore().similarity_search(query, k=k)
     return [

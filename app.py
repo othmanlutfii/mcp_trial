@@ -4,10 +4,13 @@ Halaman:
 - ``/``          assessment pembukaan akses (source IP, destination IP, port)
 - ``/compliance`` cek compliance satu IP
 
-Semua perhitungan memakai logika deterministik yang sama dengan CLI; UI hanya
-menampilkan hasilnya. Jalankan dengan ``python app.py``.
+Halaman assessment menjalankan pipeline 3 agen yang sama dengan chatbot
+(``review_access``), jadi narasi keputusannya identik dengan perintah CLI
+``Buka akses dari ... ke ... port ...``. Halaman compliance tetap deterministik
+tanpa LLM. Jalankan dengan ``python app.py``.
 """
 import os
+import time
 
 from flask import Flask, render_template, request
 
@@ -29,11 +32,27 @@ def _parse_port(raw: str) -> tuple[int | None, str | None]:
     return port, None
 
 
+def _run_ai_review(src_ip: str, dst_ip: str, port: int, assessment: dict) -> tuple[str, float]:
+    """Jalankan pipeline 3 agen yang sama dengan chatbot dan hitung durasinya.
+
+    Hasil assessment deterministik dari halaman web dipakai ulang agar tidak perlu
+    satu putaran LLM tambahan.
+    """
+    from secbot.agents.access_agents import review_access
+
+    started = time.perf_counter()
+    answer = review_access(src_ip, dst_ip, port, verbose=False, assessment=assessment)
+    return answer, time.perf_counter() - started
+
+
 @app.route("/", methods=["GET", "POST"])
 def assessment():
     form = {"src_ip": "", "dst_ip": "", "port": ""}
     errors: list[str] = []
     result = None
+    ai_answer = None
+    ai_error = None
+    ai_elapsed = None
 
     if request.method == "POST":
         form = {key: request.form.get(key, "").strip() for key in form}
@@ -53,6 +72,12 @@ def assessment():
             if "error" in result:
                 errors.append(result["error"])
                 result = None
+            else:
+                try:
+                    ai_answer, ai_elapsed = _run_ai_review(form["src_ip"], form["dst_ip"], port, result)
+                except Exception as exc:  # tampilkan kegagalan provider tanpa mematikan halaman
+                    app.logger.exception("Analisis AI gagal")
+                    ai_error = str(exc) or exc.__class__.__name__
 
     return render_template(
         "assessment.html",
@@ -60,6 +85,9 @@ def assessment():
         form=form,
         errors=errors,
         result=result,
+        ai_answer=ai_answer,
+        ai_error=ai_error,
+        ai_elapsed=ai_elapsed,
     )
 
 

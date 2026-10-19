@@ -118,21 +118,30 @@ python -m secbot              # sama dengan `python main.py`
 
 ### UI web sederhana (Flask)
 
-Dua halaman, tanpa build frontend dan tanpa memanggil LLM:
+Dua halaman, tanpa build frontend:
 
 ```bash
 python app.py                 # buka http://127.0.0.1:5000
 ```
 
 - **Assessment Buka Perangkat** (`/`) — input IP source, IP destination, dan port.
-  Hasil berisi keputusan awal, skor risiko, data kedua aset, vulnerability, dan temuan.
+  Skor risiko dihitung deterministik, lalu pipeline 3 agen AI yang sama dengan
+  chatbot (`review_access`) menyusun keputusan dan rekomendasi. Karena memanggil
+  LLM dan knowledge base, prosesnya bisa memakan puluhan detik; UI menampilkan
+  indikator loading. Bila provider gagal, hasil deterministik tetap ditampilkan.
 - **Cek Compliance IP** (`/compliance`) — input satu IP untuk melihat status
-  `COMPLIANT`/`NON-COMPLIANT` dan kontrol wajib environment-nya.
+  `COMPLIANT`/`NON-COMPLIANT` dan kontrol wajib environment-nya. Halaman ini
+  deterministik dan tidak memanggil LLM.
 
 Host/port bisa diubah lewat `WEB_HOST` dan `WEB_PORT`, misalnya
-`WEB_PORT=8080 python app.py`. UI memakai fungsi deterministik yang sama dengan
-CLI (`secbot/assessment.py` dan `secbot/compliance.py`), jadi tidak butuh API key
-maupun vector DB.
+`WEB_PORT=8080 python app.py`. Halaman assessment membutuhkan konfigurasi provider
+dan vector DB yang sama seperti CLI; halaman compliance hanya membaca data aset
+dan aturan lokal.
+
+Untuk mempercepat halaman assessment, hasil assessment deterministik yang sudah
+dihitung dipakai ulang (tanpa mengulang Assessment Agent), dan hasil pencarian
+knowledge di-cache per proses. Jadi pengecekan ulang koneksi yang sama tidak
+memanggil API embedding lagi.
 
 > **Penting:** `python ingest.py` wajib dijalankan ulang setiap kali file `.md` di
 > `knowledge/` berubah **atau** provider/model embedding diganti. Vector DB terikat
@@ -248,9 +257,10 @@ provider dilakukan malas, jadi Anda hanya perlu memasang paket provider yang dip
 | `message_text(message)` | Ambil teks dari pesan/response model apa pun formatnya (string atau list blok, blok thinking dilewati) |
 | `ProviderError` | Exception bila API key kosong atau provider tidak dikenal |
 
-Catatan mode berpikir: Ollama memakai `reasoning=SECBOT_THINKING`, Gemini memakai
-`thinking_budget=0` (saat `THINKING=false`, hanya untuk model 2.5), DeepSeek hanya
-mengaktifkan thinking bila `THINKING=true` (defaultnya memang mati).
+Catatan mode berpikir: Ollama memakai `reasoning=SECBOT_THINKING`, Gemini 2.5 memakai
+`thinking_budget=0`, Gemini 3 memakai `thinking_level=low` (saat `THINKING=false`)
+atau `high` (saat `THINKING=true`), dan DeepSeek hanya mengaktifkan thinking bila
+`THINKING=true` (defaultnya memang mati).
 
 Catatan `message_text`: provider tidak seragam. Ollama dan DeepSeek mengembalikan
 `content` berupa string, sedangkan Gemini 3 mengembalikan daftar blok
