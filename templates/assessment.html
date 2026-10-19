@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Assessment Buka Perangkat · Security Bot{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="eyebrow">Access Review</p>
+  <h1>Assessment Buka Perangkat</h1>
+  <p class="muted">Masukkan koneksi yang akan dibuka. Hasil dihitung dari data CMDB, vulnerability, dan kebijakan port.</p>
+</section>
+
+<form method="post" class="card form-card" autocomplete="off">
+  <div class="field-grid">
+    <label>
+      IP Source
+      <input type="text" name="src_ip" value="{{ form.src_ip }}" placeholder="10.10.17.120" required>
+    </label>
+    <label>
+      IP Destination
+      <input type="text" name="dst_ip" value="{{ form.dst_ip }}" placeholder="10.80.35.246" required>
+    </label>
+    <label>
+      Port
+      <input type="number" name="port" value="{{ form.port }}" placeholder="443" min="1" max="65535" required>
+    </label>
+  </div>
+  <button type="submit">Nilai Akses</button>
+</form>
+
+{% if errors %}
+<div class="alert alert-error" role="alert">
+  <strong>Input belum valid</strong>
+  <ul>
+    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if result %}
+<section class="result">
+  <div class="card result-head">
+    <div>
+      <p class="eyebrow">Keputusan Awal</p>
+      <h2 class="decision decision-{{ result.preliminary_decision|lower|replace('_', '-') }}">
+        {{ result.preliminary_decision|replace('_', ' ') }}
+      </h2>
+      <p class="muted mono">{{ result.request.src_ip }} → {{ result.request.dst_ip }} · port {{ result.request.port }}/{{ result.request.protocol }}</p>
+      <span class="chip chip-level-{{ result.port_info.level|lower }}">
+        {{ result.port_info.service }} · {{ result.port_info.level }}
+      </span>
+    </div>
+    <div class="score">
+      <span class="score-value">{{ result.risk_score }}</span>
+      <span class="score-label">Skor risiko</span>
+      <span class="chip chip-risk-{{ result.risk_level|lower }}">{{ result.risk_level }}</span>
+    </div>
+  </div>
+
+  <div class="side-grid">
+    {% for side in [result.source, result.destination] %}
+    <div class="card side-card">
+      <div class="side-head">
+        <div>
+          <p class="eyebrow">{{ "Source" if loop.first else "Destination" }}</p>
+          <h3 class="mono">{{ side.ip }}</h3>
+        </div>
+        {% if side.registered %}
+        <span class="tag tag-{{ side.gate|lower }}">Gate {{ side.gate }}</span>
+        {% else %}
+        <span class="tag tag-unknown">Tidak terdaftar</span>
+        {% endif %}
+      </div>
+
+      {% if side.registered %}
+      <dl class="kv">
+        <dt>Hostname</dt><dd>{{ side.hostname }}</dd>
+        <dt>Aplikasi</dt><dd>{{ side.application }}</dd>
+        <dt>Environment</dt><dd>{{ side.environment }}</dd>
+        <dt>Segment</dt><dd>{{ side.segment }}</dd>
+        <dt>DC</dt><dd>{{ side.dc }}</dd>
+        <dt>Kontrol</dt>
+        <dd class="controls">
+          <span class="dot {{ 'on' if side.edr else 'off' }}">EDR</span>
+          <span class="dot {{ 'on' if side.pam else 'off' }}">PAM</span>
+          <span class="dot {{ 'on' if side.va else 'off' }}">VA</span>
+        </dd>
+      </dl>
+      {% if side.gate_missing %}
+      <p class="muted">Belum aktif: {{ side.gate_missing|join(', ') }}</p>
+      {% endif %}
+      {% else %}
+      <p class="muted">Aset tidak ditemukan di CMDB (kemungkinan shadow asset).</p>
+      {% endif %}
+
+      <div class="vuln">
+        <p class="subhead">Vulnerability</p>
+        {% if side.vuln.scanned %}
+        <div class="chips">
+          {% for severity, count in side.vuln.counts.items() %}
+          <span class="chip chip-sev-{{ severity|lower }}">{{ severity }}: {{ count }}</span>
+          {% endfor %}
+        </div>
+        {% if side.vuln.top %}
+        <details>
+          <summary>Lihat temuan teratas</summary>
+          <ul class="cve-list">
+            {% for vuln in side.vuln.top %}
+            <li><span class="mono">{{ vuln.cve }}</span> · {{ vuln.severity }} ({{ vuln.cvss }}) — {{ vuln.name }}</li>
+            {% endfor %}
+          </ul>
+        </details>
+        {% endif %}
+        {% else %}
+        <p class="muted">Belum ada data VA untuk server ini.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if result.findings %}
+  <div class="card">
+    <h3>Temuan &amp; bobot risiko</h3>
+    <ul class="findings">
+      {% for finding in result.findings %}<li>{{ finding }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if result.hard_blocks %}
+  <div class="alert alert-error">
+    <strong>Hard block</strong>
+    <ul>
+      {% for block in result.hard_blocks %}<li>{{ block }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

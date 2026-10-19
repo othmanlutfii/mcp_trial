@@ -9,7 +9,8 @@ Semua perhitungan tetap dilakukan kode, bukan ditebak oleh LLM.
 """
 from langchain_core.tools import tool
 
-from . import datasource, knowledge, policies
+from . import datasource, knowledge
+from .compliance import compliance_status
 
 
 # ---------- Fungsi inti (deterministik) ----------
@@ -50,24 +51,6 @@ def vulns_by_ip(ip: str) -> dict:
         "lastSeen": data["lastSeen"],
         "severityCounts": counts,
         "vulnerabilities": daftar,
-    }
-
-
-def compliance_status(ip: str) -> dict:
-    """Status compliance satu server terhadap kontrol wajib environment-nya."""
-    asset = asset_by_ip(ip)
-    if "error" in asset:
-        return asset
-    env = asset["environment"]
-    wajib = policies.REQUIRED_CONTROLS.get(env, [])
-    kurang = [k.upper() for k in wajib if not asset.get(k)]
-    return {
-        "ip": ip,
-        "hostname": asset["hostname"],
-        "environment": env,
-        "kontrol_wajib": [k.upper() for k in wajib],
-        "kontrol_belum_terpenuhi": kurang,
-        "status": "COMPLIANT" if not kurang else "NON-COMPLIANT",
     }
 
 

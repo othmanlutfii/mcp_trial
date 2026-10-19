@@ -116,6 +116,24 @@ python main.py "Buka akses dari 172.16.1.10 ke 10.10.6.30 port 1433"   # sekali 
 python -m secbot              # sama dengan `python main.py`
 ```
 
+### UI web sederhana (Flask)
+
+Dua halaman, tanpa build frontend dan tanpa memanggil LLM:
+
+```bash
+python app.py                 # buka http://127.0.0.1:5000
+```
+
+- **Assessment Buka Perangkat** (`/`) — input IP source, IP destination, dan port.
+  Hasil berisi keputusan awal, skor risiko, data kedua aset, vulnerability, dan temuan.
+- **Cek Compliance IP** (`/compliance`) — input satu IP untuk melihat status
+  `COMPLIANT`/`NON-COMPLIANT` dan kontrol wajib environment-nya.
+
+Host/port bisa diubah lewat `WEB_HOST` dan `WEB_PORT`, misalnya
+`WEB_PORT=8080 python app.py`. UI memakai fungsi deterministik yang sama dengan
+CLI (`secbot/assessment.py` dan `secbot/compliance.py`), jadi tidak butuh API key
+maupun vector DB.
+
 > **Penting:** `python ingest.py` wajib dijalankan ulang setiap kali file `.md` di
 > `knowledge/` berubah **atau** provider/model embedding diganti. Vector DB terikat
 > pada model embedding yang membuatnya. Aplikasi akan memberi pesan jelas bila
@@ -150,8 +168,11 @@ Bot > Permintaan ini terlihat seperti review pembukaan akses, tetapi datanya bel
 ```
 .
 ├── main.py                 # entry point tunggal  -> secbot/graph.py
+├── app.py                  # UI web Flask (2 halaman)
 ├── ingest.py               # entry point ingest   -> secbot/ingest.py
 ├── requirements.txt
+├── templates/              # template HTML UI web
+├── static/                 # CSS UI web
 ├── .env.example            # contoh isian API key (salin jadi .env)
 ├── .gitignore
 ├── data/                   # data dummy (pengganti API CMDB :8001 dan API VA :8002)
@@ -171,6 +192,8 @@ Bot > Permintaan ini terlihat seperti review pembukaan akses, tetapi datanya bel
     ├── llm.py              # pabrik model chat & embedding per provider
     ├── datasource.py       # baca data aset & vulnerability
     ├── policies.py         # aturan deterministik (compliance & port)
+    ├── assessment.py       # skoring risiko pembukaan akses (dipakai CLI & UI)
+    ├── compliance.py       # cek compliance per environment (dipakai CLI & UI)
     ├── knowledge.py        # embedding + akses vector DB
     ├── tools.py            # 5 tool agen chat
     ├── router.py           # deteksi intent + ekstraksi data permintaan akses
@@ -179,7 +202,7 @@ Bot > Permintaan ini terlihat seperti review pembukaan akses, tetapi datanya bel
     ├── ingest.py           # bangun vector DB dari knowledge/
     └── agents/             # mesin review pembukaan akses
         ├── __init__.py
-        ├── access_tools.py     # tool assess_connection (skoring risiko)
+        ├── access_tools.py     # tool assess_connection (bungkus secbot/assessment.py)
         └── access_agents.py    # pipeline 3 agen
 ```
 

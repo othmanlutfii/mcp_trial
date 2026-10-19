@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Cek Compliance IP · Security Bot{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="eyebrow">Daily Compliance</p>
+  <h1>Cek Compliance IP</h1>
+  <p class="muted">Masukkan IP server untuk memeriksa kontrol wajib sesuai environment-nya.</p>
+</section>
+
+<form method="post" class="card form-card" autocomplete="off">
+  <div class="field-grid single">
+    <label>
+      IP Address
+      <input type="text" name="ip" value="{{ form.ip }}" placeholder="192.168.5.21" required>
+    </label>
+  </div>
+  <button type="submit">Cek Compliance</button>
+</form>
+
+{% if errors %}
+<div class="alert alert-error" role="alert">
+  <strong>Input belum valid</strong>
+  <ul>
+    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if result %}
+<section class="result">
+  <div class="card result-head">
+    <div>
+      <p class="eyebrow">Status Compliance</p>
+      <h2 class="decision decision-{{ result.status|lower }}">{{ result.status }}</h2>
+      <p class="muted mono">{{ result.hostname }} · {{ result.ip }} · {{ result.environment }}</p>
+    </div>
+    <div class="score">
+      <span class="score-value">{{ terpenuhi }}/{{ result.kontrol_wajib|length }}</span>
+      <span class="score-label">Kontrol wajib terpenuhi</span>
+    </div>
+  </div>
+
+  <div class="side-grid">
+    <div class="card">
+      <h3>Kontrol keamanan</h3>
+      <div class="controls-grid">
+        {% for control in ["edr", "pam", "va"] %}
+        <div class="control-card {{ 'is-on' if asset[control] else 'is-off' }}">
+          <span class="control-name">{{ control|upper }}</span>
+          <span class="control-state">{{ "Aktif" if asset[control] else "Tidak aktif" }}</span>
+          <span class="chip">{{ "Wajib" if control|upper in result.kontrol_wajib else "Tidak wajib" }}</span>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if result.kontrol_belum_terpenuhi %}
+      <div class="alert alert-error compact">
+        <strong>Belum terpenuhi</strong>
+        <p>{{ result.kontrol_belum_terpenuhi|join(', ') }}</p>
+      </div>
+      {% else %}
+      <div class="alert alert-ok compact">
+        <strong>Semua kontrol wajib sudah aktif.</strong>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h3>Detail aset</h3>
+      <dl class="kv">
+        <dt>Hostname</dt><dd>{{ asset.hostname }}</dd>
+        <dt>Aplikasi</dt><dd>{{ asset.application }}</dd>
+        <dt>Environment</dt><dd>{{ result.environment }}</dd>
+        <dt>Segment</dt><dd>{{ asset.segment }}</dd>
+        <dt>DC</dt><dd>{{ asset.dc }}</dd>
+        <dt>Operating System</dt><dd>{{ asset.operating_system }}</dd>
+      </dl>
+      <p class="subhead">Kontrol wajib untuk {{ result.environment }}</p>
+      <div class="chips">
+        {% for control in result.kontrol_wajib %}
+        <span class="chip">{{ control }}</span>
+        {% else %}
+        <span class="muted">Tidak ada kontrol wajib untuk environment ini.</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -14,3 +14,6 @@ langchain-text-splitters
 
 # Baca API key dari file .env
 python-dotenv
+
+# UI web sederhana (dua halaman)
+flask>=3.0

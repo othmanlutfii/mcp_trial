@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Security Bot{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('assessment') }}">
+      <span class="brand-mark">SB</span> Security Bot
+    </a>
+    <nav>
+      <a href="{{ url_for('assessment') }}" class="{{ 'active' if active == 'assessment' else '' }}">Assessment Buka Perangkat</a>
+      <a href="{{ url_for('compliance') }}" class="{{ 'active' if active == 'compliance' else '' }}">Cek Compliance IP</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

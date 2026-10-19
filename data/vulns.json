@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "ip": "10.10.5.21",
+    "ip": "192.168.5.21",
     "dnsName": "srv-core-app01.corp.local",
     "operatingSystem": "Windows Server 2019",
     "severity": "Critical",
@@ -26,7 +26,7 @@
   },
   {
     "id": 2,
-    "ip": "10.10.6.30",
+    "ip": "192.168.6.30",
     "dnsName": "srv-core-db01.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 8",
     "severity": "Critical",
@@ -51,7 +51,7 @@
   },
   {
     "id": 3,
-    "ip": "172.16.1.10",
+    "ip": "10.45.1.10",
     "dnsName": "srv-portal-web01.corp.local",
     "operatingSystem": "Ubuntu 20.04",
     "severity": "High",
@@ -69,7 +69,7 @@
   },
   {
     "id": 4,
-    "ip": "10.20.1.15",
+    "ip": "192.168.1.15",
     "dnsName": "srv-portal-uat01.corp.local",
     "operatingSystem": "Ubuntu 22.04",
     "severity": "Medium",
@@ -87,7 +87,7 @@
   },
   {
     "id": 5,
-    "ip": "10.10.5.22",
+    "ip": "192.168.5.22",
     "dnsName": "srv-core-app02.corp.local",
     "operatingSystem": "Ubuntu 22.04",
     "severity": "Low",
@@ -105,7 +105,7 @@
   },
   {
     "id": 6,
-    "ip": "10.10.7.50",
+    "ip": "192.168.7.50",
     "dnsName": "srv-core-app01.corp.local",
     "operatingSystem": "Windows Server 2022",
     "severity": "High",
@@ -130,7 +130,7 @@
   },
   {
     "id": 7,
-    "ip": "10.20.8.57",
+    "ip": "192.168.8.57",
     "dnsName": "srv-portal-app01.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 8",
     "severity": "Critical",
@@ -155,7 +155,7 @@
   },
   {
     "id": 8,
-    "ip": "10.30.9.64",
+    "ip": "192.168.9.64",
     "dnsName": "srv-hr-app01.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 9",
     "severity": "Critical",
@@ -180,7 +180,7 @@
   },
   {
     "id": 9,
-    "ip": "10.40.10.71",
+    "ip": "192.168.10.71",
     "dnsName": "srv-paygw-app01.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 8",
     "severity": "High",
@@ -198,7 +198,7 @@
   },
   {
     "id": 10,
-    "ip": "172.16.11.78",
+    "ip": "192.168.11.78",
     "dnsName": "srv-ibank-app02.corp.local",
     "operatingSystem": "Ubuntu 20.04",
     "severity": "Medium",
@@ -216,7 +216,7 @@
   },
   {
     "id": 11,
-    "ip": "10.50.12.85",
+    "ip": "192.168.12.85",
     "dnsName": "srv-fraud-db02.corp.local",
     "operatingSystem": "Windows Server 2022",
     "severity": "Low",
@@ -234,7 +234,7 @@
   },
   {
     "id": 12,
-    "ip": "10.60.13.92",
+    "ip": "192.168.13.92",
     "dnsName": "srv-dwh-db02.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 8",
     "severity": "High",
@@ -259,7 +259,7 @@
   },
   {
     "id": 13,
-    "ip": "10.70.14.99",
+    "ip": "192.168.14.99",
     "dnsName": "srv-mobile-app02.corp.local",
     "operatingSystem": "Oracle Linux 8",
     "severity": "Critical",
@@ -284,7 +284,7 @@
   },
   {
     "id": 14,
-    "ip": "172.17.16.113",
+    "ip": "192.168.16.113",
     "dnsName": "srv-api-app02.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 9",
     "severity": "Critical",
@@ -309,7 +309,7 @@
   },
   {
     "id": 15,
-    "ip": "10.10.17.120",
+    "ip": "192.168.17.120",
     "dnsName": "srv-core-app02.corp.local",
     "operatingSystem": "Ubuntu 20.04",
     "severity": "High",
@@ -327,7 +327,7 @@
   },
   {
     "id": 16,
-    "ip": "10.20.18.127",
+    "ip": "10.45.18.127",
     "dnsName": "srv-portal-dmz02.corp.local",
     "operatingSystem": "Oracle Linux 8",
     "severity": "Medium",
@@ -345,7 +345,7 @@
   },
   {
     "id": 17,
-    "ip": "10.30.19.134",
+    "ip": "192.168.19.134",
     "dnsName": "srv-hr-db02.corp.local",
     "operatingSystem": "SUSE Linux Enterprise 15",
     "severity": "Low",
@@ -363,7 +363,7 @@
   },
   {
     "id": 18,
-    "ip": "10.40.20.141",
+    "ip": "192.168.20.141",
     "dnsName": "srv-paygw-db02.corp.local",
     "operatingSystem": "Windows Server 2016",
     "severity": "High",
@@ -388,7 +388,7 @@
   },
   {
     "id": 19,
-    "ip": "172.16.21.148",
+    "ip": "10.45.21.148",
     "dnsName": "srv-ibank-dmz03.corp.local",
     "operatingSystem": "Windows Server 2016",
     "severity": "Critical",
@@ -413,7 +413,7 @@
   },
   {
     "id": 20,
-    "ip": "10.60.23.162",
+    "ip": "192.168.23.162",
     "dnsName": "srv-dwh-app03.corp.local",
     "operatingSystem": "Red Hat Enterprise Linux 9",
     "severity": "Critical",
@@ -438,7 +438,7 @@
   },
   {
     "id": 21,
-    "ip": "10.80.25.176",
+    "ip": "192.168.25.176",
     "dnsName": "srv-idm-app03.corp.local",
     "operatingSystem": "Windows Server 2016",
     "severity": "High",
@@ -456,7 +456,7 @@
   },
   {
     "id": 22,
-    "ip": "172.17.26.183",
+    "ip": "192.168.26.183",
     "dnsName": "srv-api-app03.corp.local",
     "operatingSystem": "Ubuntu 20.04",
     "severity": "Medium",
@@ -474,7 +474,7 @@
   },
   {
     "id": 23,
-    "ip": "10.10.27.190",
+    "ip": "192.168.27.190",
     "dnsName": "srv-core-app03.corp.local",
     "operatingSystem": "Oracle Linux 8",
     "severity": "Low",
@@ -492,7 +492,7 @@
   },
   {
     "id": 24,
-    "ip": "10.20.28.197",
+    "ip": "192.168.28.197",
     "dnsName": "srv-portal-app03.corp.local",
     "operatingSystem": "SUSE Linux Enterprise 15",
     "severity": "High",
@@ -517,7 +517,7 @@
   },
   {
     "id": 25,
-    "ip": "10.30.29.204",
+    "ip": "192.168.29.204",
     "dnsName": "srv-hr-db03.corp.local",
     "operatingSystem": "Ubuntu 20.04",
     "severity": "Critical",
@@ -542,7 +542,7 @@
   },
   {
     "id": 26,
-    "ip": "10.40.30.211",
+    "ip": "10.45.30.211",
     "dnsName": "srv-paygw-dmz03.corp.local",
     "operatingSystem": "Windows Server 2022",
     "severity": "Critical",
@@ -567,1041 +567,9 @@
   },
   {
     "id": 27,
-    "ip": "172.16.31.218",
+    "ip": "192.168.31.218",
     "dnsName": "srv-ibank-app04.corp.local",
     "operatingSystem": "Windows Server 2019",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-10",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 28,
-    "ip": "10.60.33.232",
-    "dnsName": "srv-dwh-db04.corp.local",
-    "operatingSystem": "Oracle Linux 8",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-08",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 29,
-    "ip": "10.70.34.239",
-    "dnsName": "srv-mobile-app04.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-07",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 30,
-    "ip": "10.80.35.246",
-    "dnsName": "srv-idm-db04.corp.local",
-    "operatingSystem": "Ubuntu 20.04",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-05",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 31,
-    "ip": "172.17.36.3",
-    "dnsName": "srv-api-app04.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 32,
-    "ip": "10.10.37.10",
-    "dnsName": "srv-core-db04.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-03",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 33,
-    "ip": "10.20.38.17",
-    "dnsName": "srv-portal-app04.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 34,
-    "ip": "10.30.39.24",
-    "dnsName": "srv-hr-db04.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-07",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 35,
-    "ip": "10.40.40.31",
-    "dnsName": "srv-paygw-db04.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-07",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 36,
-    "ip": "172.16.41.38",
-    "dnsName": "srv-ibank-app05.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-03",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 37,
-    "ip": "10.80.45.66",
-    "dnsName": "srv-idm-db05.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 9",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 38,
-    "ip": "172.17.46.73",
-    "dnsName": "srv-api-app05.corp.local",
-    "operatingSystem": "Windows Server 2019",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-05",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 39,
-    "ip": "10.10.47.80",
-    "dnsName": "srv-core-app05.corp.local",
-    "operatingSystem": "Ubuntu 20.04",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 40,
-    "ip": "10.20.48.87",
-    "dnsName": "srv-portal-app05.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 41,
-    "ip": "10.30.49.94",
-    "dnsName": "srv-hr-app05.corp.local",
-    "operatingSystem": "Windows Server 2022",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 42,
-    "ip": "172.16.51.108",
-    "dnsName": "srv-ibank-app06.corp.local",
-    "operatingSystem": "Windows Server 2022",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 43,
-    "ip": "10.50.52.115",
-    "dnsName": "srv-fraud-db06.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 9",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 44,
-    "ip": "10.60.53.122",
-    "dnsName": "srv-dwh-db06.corp.local",
-    "operatingSystem": "Windows Server 2016",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-05",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 45,
-    "ip": "10.70.54.129",
-    "dnsName": "srv-mobile-app06.corp.local",
-    "operatingSystem": "Windows Server 2019",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-05",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 46,
-    "ip": "172.17.56.143",
-    "dnsName": "srv-api-dmz06.corp.local",
-    "operatingSystem": "Windows Server 2016",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-10",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 47,
-    "ip": "10.20.58.157",
-    "dnsName": "srv-portal-app06.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 8",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-10",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 48,
-    "ip": "10.30.59.164",
-    "dnsName": "srv-hr-db06.corp.local",
-    "operatingSystem": "Windows Server 2019",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-10",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 49,
-    "ip": "10.40.60.171",
-    "dnsName": "srv-paygw-db06.corp.local",
-    "operatingSystem": "Ubuntu 20.04",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 50,
-    "ip": "172.16.61.178",
-    "dnsName": "srv-ibank-dmz07.corp.local",
-    "operatingSystem": "Windows Server 2016",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-08",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 51,
-    "ip": "10.50.62.185",
-    "dnsName": "srv-fraud-db07.corp.local",
-    "operatingSystem": "Ubuntu 20.04",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-07",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 52,
-    "ip": "10.60.63.192",
-    "dnsName": "srv-dwh-app07.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 53,
-    "ip": "172.17.66.213",
-    "dnsName": "srv-api-dmz07.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-03",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 54,
-    "ip": "10.10.67.220",
-    "dnsName": "srv-core-db07.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 8",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 55,
-    "ip": "10.40.70.241",
-    "dnsName": "srv-paygw-app07.corp.local",
-    "operatingSystem": "Windows Server 2019",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 56,
-    "ip": "172.16.71.248",
-    "dnsName": "srv-ibank-app08.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 8",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 57,
-    "ip": "10.60.73.12",
-    "dnsName": "srv-dwh-db08.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 58,
-    "ip": "10.80.75.26",
-    "dnsName": "srv-idm-db08.corp.local",
-    "operatingSystem": "Oracle Linux 8",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-03",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 59,
-    "ip": "10.10.77.40",
-    "dnsName": "srv-core-db08.corp.local",
-    "operatingSystem": "Ubuntu 20.04",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 60,
-    "ip": "10.20.78.47",
-    "dnsName": "srv-portal-app08.corp.local",
-    "operatingSystem": "Windows Server 2016",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-08",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 61,
-    "ip": "172.16.81.68",
-    "dnsName": "srv-ibank-dmz09.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 62,
-    "ip": "10.50.82.75",
-    "dnsName": "srv-fraud-app09.corp.local",
-    "operatingSystem": "Oracle Linux 8",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-05",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 63,
-    "ip": "10.60.83.82",
-    "dnsName": "srv-dwh-db09.corp.local",
-    "operatingSystem": "Windows Server 2016",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-08",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 64,
-    "ip": "10.80.85.96",
-    "dnsName": "srv-idm-db09.corp.local",
-    "operatingSystem": "Ubuntu 20.04",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-10",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 65,
-    "ip": "172.17.86.103",
-    "dnsName": "srv-api-dmz09.corp.local",
-    "operatingSystem": "Ubuntu 22.04",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 66,
-    "ip": "10.10.87.110",
-    "dnsName": "srv-core-app09.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 8",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-05",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 67,
-    "ip": "10.20.88.117",
-    "dnsName": "srv-portal-app09.corp.local",
-    "operatingSystem": "Windows Server 2016",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-06",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 68,
-    "ip": "10.30.89.124",
-    "dnsName": "srv-hr-app09.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 9",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 69,
-    "ip": "10.40.90.131",
-    "dnsName": "srv-paygw-app09.corp.local",
-    "operatingSystem": "Windows Server 2019",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-07",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2022-26925",
-        "name": "Windows LSA Spoofing",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Install pembaruan keamanan Windows yang relevan dan validasi status patch"
-      }
-    ]
-  },
-  {
-    "id": 70,
-    "ip": "10.60.93.152",
-    "dnsName": "srv-dwh-app10.corp.local",
-    "operatingSystem": "Windows Server 2022",
-    "severity": "Medium",
-    "score": 5.3,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-4911",
-        "name": "glibc Looney Tunables LPE",
-        "severity": "Medium",
-        "cvss": 5.3,
-        "solution": "Perbarui paket glibc melalui repositori resmi distribusi dan reboot jika diperlukan"
-      }
-    ]
-  },
-  {
-    "id": 71,
-    "ip": "10.70.94.159",
-    "dnsName": "srv-mobile-dmz10.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "Low",
-    "score": 3.1,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-5678",
-        "name": "OpenSSL DH excessive time",
-        "severity": "Low",
-        "cvss": 3.1,
-        "solution": "Perbarui OpenSSL melalui repositori resmi dan verifikasi versi paket yang terpasang"
-      }
-    ]
-  },
-  {
-    "id": 72,
-    "ip": "10.80.95.166",
-    "dnsName": "srv-idm-db10.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 8",
-    "severity": "High",
-    "score": 8.1,
-    "lastSeen": "2026-10-07",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2023-38408",
-        "name": "OpenSSH ssh-agent RCE",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Upgrade OpenSSH ke versi vendor yang telah diperbaiki dan batasi penggunaan agent forwarding bila tidak diperlukan"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan patch vendor untuk layanan HTTP/2 dan tinjau mitigasi pada reverse proxy atau web server"
-      }
-    ]
-  },
-  {
-    "id": 73,
-    "ip": "10.10.97.180",
-    "dnsName": "srv-core-app10.corp.local",
-    "operatingSystem": "Red Hat Enterprise Linux 8",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-09",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2024-38063",
-        "name": "Windows TCP/IP IPv6 RCE",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Install KB5041578 atau pembaruan keamanan Windows yang lebih baru"
-      },
-      {
-        "cve": "CVE-2023-44487",
-        "name": "HTTP/2 Rapid Reset DoS",
-        "severity": "High",
-        "cvss": 7.5,
-        "solution": "Terapkan pembaruan keamanan yang sesuai pada web server dan batasi dampak HTTP/2 Rapid Reset"
-      }
-    ]
-  },
-  {
-    "id": 74,
-    "ip": "10.30.99.194",
-    "dnsName": "srv-hr-app10.corp.local",
-    "operatingSystem": "SUSE Linux Enterprise 15",
-    "severity": "Critical",
-    "score": 9.8,
-    "lastSeen": "2026-10-04",
-    "vulnerabilities": [
-      {
-        "cve": "CVE-2021-41773",
-        "name": "Apache HTTP Server Path Traversal",
-        "severity": "Critical",
-        "cvss": 9.8,
-        "solution": "Upgrade Apache HTTP Server ke versi yang telah diperbaiki dan verifikasi konfigurasi akses"
-      },
-      {
-        "cve": "CVE-2024-6387",
-        "name": "OpenSSH regreSSHion RCE",
-        "severity": "High",
-        "cvss": 8.1,
-        "solution": "Perbarui OpenSSH ke versi yang telah diperbaiki oleh vendor lalu restart layanan sesuai prosedur"
-      }
-    ]
-  },
-  {
-    "id": 75,
-    "ip": "10.40.100.201",
-    "dnsName": "srv-paygw-dmz10.corp.local",
-    "operatingSystem": "Windows Server 2022",
     "severity": "High",
     "score": 8.1,
     "lastSeen": "2026-10-10",
