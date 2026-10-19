@@ -1,0 +1,152 @@
+<mxfile host="app.diagrams.net" modified="2026-10-12T03:48:00.000Z" agent="Copilot" version="24.7.17" type="device">
+  <diagram id="ai-topology" name="Topologi AI Security Bot">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="TOPOLOGI AI - SECURITY BOT" style="text;html=1;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#16324F;" vertex="1" parent="1">
+          <mxGeometry x="40" y="15" width="600" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="Alur runtime, tool-calling, assessment deterministik, dan retrieval knowledge" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#526477;" vertex="1" parent="1">
+          <mxGeometry x="40" y="48" width="800" height="25" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="user" value="Pengguna&#xa;pertanyaan / permintaan akses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F2FF;strokeColor=#4A86C5;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="190" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="cli" value="CLI Python&#xa;main.py / python -m secbot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F2FF;strokeColor=#4A86C5;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="285" y="100" width="210" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="graph" value="LangGraph Supervisor&#xa;BotState + MemorySaver" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="100" width="220" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="router" value="Router&#xa;rule-based first, LLM fallback" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="85" width="210" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="model" value="Chat LLM Provider&#xa;Ollama / Gemini / DeepSeek&#xa;model dipilih lewat config / .env" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="95" width="300" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="chatBg" value="JALUR A - TANYA JAWAB KEAMANAN" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;fillColor=#F5F9FF;swimlaneFillColor=#DCEAF7;strokeColor=#6C8EBF;fontStyle=1;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="230" width="750" height="420" as="geometry"/>
+        </mxCell>
+        <mxCell id="chatAgent" value="ReAct Chat Agent&#xa;secbot.chat&#xa;pilih tool dan susun jawaban" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="205" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="chatTools" value="Tools Informasi&#xa;get_asset_by_ip&#xa;search_asset | get_vulns_by_ip&#xa;check_compliance | search_knowledge" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="355" y="285" width="330" height="125" as="geometry"/>
+        </mxCell>
+        <mxCell id="chatAnswer" value="Jawaban informasi&#xa;berdasarkan hasil tool + sumber" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="110" y="500" width="250" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="chatNote" value="Contoh: data aset, compliance, CVE, SLA, kebijakan" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#526477;" vertex="1" parent="1">
+          <mxGeometry x="385" y="500" width="310" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="accessBg" value="JALUR B - REVIEW PEMBUKAAN AKSES" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;fillColor=#FFF9F0;swimlaneFillColor=#FCE5CD;strokeColor=#D79B00;fontStyle=1;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="830" y="230" width="1030" height="420" as="geometry"/>
+        </mxCell>
+        <mxCell id="assessmentAgent" value="Assessment Agent&#xa;meminta penilaian koneksi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="865" y="300" width="175" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="assessTool" value="assess_connection&#xa;validasi + ambil data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="300" width="165" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="calc" value="Assessment deterministik&#xa;EDR / PAM / VA&#xa;port + zona + vulnerability&#xa;skor + keputusan awal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="285" width="205" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="raw" value="Hasil assessment&#xa;terstruktur / mentah" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1520" y="300" width="150" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="policyAgent" value="Policy Agent&#xa;cari aturan relevan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="865" y="455" width="175" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="searchKB" value="search_knowledge&#xa;retrieval kebijakan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="455" width="165" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="policyResults" value="Aturan hasil retrieval&#xa;sumber + bagian + isi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="455" width="190" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="reviewer" value="Reviewer Agent&#xa;gabungkan assessment + aturan&#xa;keputusan tidak boleh lebih longgar" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1520" y="445" width="270" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="accessAnswer" value="Keputusan + risiko&#xa;ringkasan + rekomendasi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1550" y="570" width="210" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="clarify" value="Data akses belum lengkap&#xa;minta klarifikasi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="850" y="680" width="190" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="pending" value="pending_request&#xa;disimpan pada BotState" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="680" width="190" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sourcesBg" value="DATA, KNOWLEDGE, DAN EMBEDDING" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;fillColor=#F7F7F7;swimlaneFillColor=#E6E6E6;strokeColor=#666666;fontStyle=1;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="790" width="1820" height="230" as="geometry"/>
+        </mxCell>
+        <mxCell id="jsonData" value="Data operasional&#xa;assets.json + vulns.json&#xa;CMDB / VA dummy lokal" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="90" y="865" width="215" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="policyCode" value="Aturan kode&#xa;compliance + port&#xa;secbot.policies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="865" width="190" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="mdFiles" value="knowledge/*.md&#xa;access / compliance / port / SLA" style="shape=note;whiteSpace=wrap;html=1;size=15;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="625" y="865" width="225" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="ingest" value="python ingest.py&#xa;split heading + embedding" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="900" y="865" width="210" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="vectorDB" value="Chroma Vector DB&#xa;vectordb/&#xa;embedding.json signature" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="865" width="220" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="embedding" value="Embedding Provider&#xa;Ollama / Gemini&#xa;query embedding saat retrieval" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1490" y="865" width="260" height="105" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;" edge="1" parent="1" source="user" target="cli"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;" edge="1" parent="1" source="cli" target="graph"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;" edge="1" parent="1" source="graph" target="router"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="pertanyaan informasi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;fontSize=11;" edge="1" parent="1" source="router" target="chatAgent"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="intent / koneksi akses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;fontSize=11;" edge="1" parent="1" source="router" target="assessmentAgent"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="fallback intent" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="router" target="model"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="model/tool calling" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="chatAgent" target="model"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" value="pilih / panggil tool" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#6C8EBF;fontSize=11;" edge="1" parent="1" source="chatAgent" target="chatTools"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" value="hasil tool" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#6C8EBF;fontSize=11;" edge="1" parent="1" source="chatTools" target="chatAgent"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" value="jawaban" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;fontSize=11;" edge="1" parent="1" source="chatAgent" target="chatAnswer"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="e11" value="invoke tool" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;fontSize=11;" edge="1" parent="1" source="assessmentAgent" target="assessTool"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" value="data aset + rule" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;fontSize=11;" edge="1" parent="1" source="assessTool" target="calc"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" value="assessment terstruktur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B85450;fontSize=11;" edge="1" parent="1" source="calc" target="raw"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" value="tahap berikutnya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;fontSize=11;" edge="1" parent="1" source="assessmentAgent" target="policyAgent"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" value="query kebijakan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="policyAgent" target="searchKB"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e16" value="hasil retrieval" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="searchKB" target="policyResults"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e17" value="assessment mentah" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B85450;fontSize=11;" edge="1" parent="1" source="raw" target="reviewer"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e18" value="aturan + sumber" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="policyResults" target="reviewer"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e19" value="generate narasi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="reviewer" target="model"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e20" value="hasil review" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;fontSize=11;" edge="1" parent="1" source="reviewer" target="accessAnswer"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e21" value="field wajib kurang" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;fontSize=11;" edge="1" parent="1" source="router" target="clarify"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e22" value="simpan permintaan pending" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;fontSize=11;" edge="1" parent="1" source="clarify" target="pending"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="e23" value="lookup aset / vuln" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;fontSize=11;" edge="1" parent="1" source="chatTools" target="jsonData"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e24" value="hitung compliance / port" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;fontSize=11;" edge="1" parent="1" source="chatTools" target="policyCode"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e25" value="query embedding" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="searchKB" target="embedding"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e26" value="vector search" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#6C8EBF;fontSize=11;" edge="1" parent="1" source="searchKB" target="vectorDB"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e27" value="sumber dokumen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="mdFiles" target="ingest"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e28" value="buat embedding" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="ingest" target="embedding"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e29" value="simpan index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#6C8EBF;fontSize=11;" edge="1" parent="1" source="ingest" target="vectorDB"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e30" value="retrieve chunk relevan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#6C8EBF;fontSize=11;" edge="1" parent="1" source="vectorDB" target="searchKB"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e31" value="assessment tool call" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="assessmentAgent" target="model"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e32" value="policy tool call" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="policyAgent" target="model"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e33" value="baca aset dan vuln" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;fontSize=11;" edge="1" parent="1" source="calc" target="jsonData"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e34" value="aturan scoring" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;fontSize=11;" edge="1" parent="1" source="calc" target="policyCode"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e35" value="pencarian knowledge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="chatTools" target="vectorDB"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e36" value="embedding query" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;fontSize=11;" edge="1" parent="1" source="chatTools" target="embedding"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="legend" value="Legenda:  garis penuh = aliran data / pemanggilan komponen    |    garis putus-putus = konfigurasi atau fallback model    |    skor dan keputusan awal dihitung oleh kode" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#526477;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1500" height="30" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

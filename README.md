@@ -55,6 +55,7 @@ Override model tanpa mengedit kode: `SECBOT_GEMINI_MODEL=gemini-2.5-flash`, `SEC
 
 Pola **supervisor router**: satu grafik state, router memilih cabang, kedua cabang
 menulis ke riwayat pesan yang sama sehingga memori percakapan tetap nyambung.
+Diagram komponen dan penjelasan alur end-to-end tersedia di [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ```mermaid
 flowchart TD
