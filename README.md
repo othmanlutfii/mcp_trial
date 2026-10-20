@@ -57,7 +57,9 @@ Pola **supervisor router**: satu grafik state, router memilih cabang, kedua caba
 menulis ke riwayat pesan yang sama sehingga memori percakapan tetap nyambung.
 Diagram komponen dan penjelasan alur end-to-end tersedia di [ARCHITECTURE.md](./ARCHITECTURE.md).
 Diagram arsitektur khusus lapisan AI (editable di diagrams.net) ada di
-[arsitektur-ai.drawio](./arsitektur-ai.drawio).
+[arsitektur-ai.drawio](./arsitektur-ai.drawio). Walkthrough penilaian koneksi dari
+input IP/port sampai jawaban akhir, lengkap dengan input/output setiap fungsi, ada di
+[DOKUMENTASI_PENILAIAN_KONEKSI.md](./DOKUMENTASI_PENILAIAN_KONEKSI.md).
 
 ```mermaid
 flowchart TD

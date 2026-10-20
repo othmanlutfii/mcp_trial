@@ -45,7 +45,7 @@ def required_controls(
     - Environment yang tidak dinyatakan (mis. Pre-Prod/SIT) -> ``None`` (gate UNKNOWN),
       bukan diasumsikan compliant.
     """
-    if (segment or "").strip().upper() == "LAN":
+    if segment_kind(segment) == "lan":
         return ["edr"]  # C-5: EDR tetap wajib, PAM/VA tidak wajib
     spec = COMPLIANCE_MATRIX.get(normalize_environment(environment))
     return list(spec["default"]) if spec else None
@@ -300,9 +300,11 @@ def segment_rule(
     """Aturan segmen NET.md; workstation LAN Campus memakai WS/W."""
     src_kind, dst_kind = segment_kind(src_segment), segment_kind(dst_segment)
     src_zone, dst_zone = zone_kind(src_category), zone_kind(dst_category)
+    src_workstation = src_kind == "lan" or src_zone == "workstation"
+    dst_workstation = dst_kind == "lan" or dst_zone == "workstation"
 
-    if src_zone == "workstation" or dst_zone == "workstation":
-        if src_zone == "workstation" and dst_zone == "workstation":
+    if src_workstation or dst_workstation:
+        if src_workstation and dst_workstation:
             if port in {22, 445}:
                 return _rule(
                     "ALLOW", "W-3", 0, "LAN Campus ke LAN Campus untuk transfer file"
@@ -313,7 +315,7 @@ def segment_rule(
                 35,
                 "LAN Campus ke LAN Campus hanya untuk transfer file (SMB/SFTP)",
             )
-        if src_zone == "workstation":
+        if src_workstation:
             return _workstation_rule(dst_segment or "", dst_environment, port)
         src_env = normalize_environment(src_environment)
         if src_env in PRODUCTION_SIDE:

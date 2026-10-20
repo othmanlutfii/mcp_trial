@@ -35,6 +35,10 @@ ATURAN KERAS:
   DENY, REVIEW_REQUIRED, APPROVE_WITH_CONDITIONS, APPROVE.
 - Jika DATA ASSESSMENT memuat conditions atau review_reasons, sebutkan sebagai syarat
   yang wajib dipenuhi; jangan menyatakan APPROVE tanpa memenuhinya.
+- Jika asset_type adalah endpoint (segmen LAN), sebut sebagai PC/endpoint, jangan
+    kategorikan sebagai server, dan jangan menilai environment endpoint sebagai environment
+    server. Gunakan aturan workstation/LAN untuk arah aksesnya; aturan server S-1..S-4
+    hanya berlaku jika kedua sisi adalah server.
 - Rekomendasi harus konkret dan merujuk pada temuan (IP/hostname/CVE/port).
 
 FORMAT JAWABAN:
@@ -114,13 +118,15 @@ def review_access(
     s, d = data["source"], data["destination"]
     policy_context = {
         "source": {
-            "environment": s.get("environment", "UNKNOWN"),
+            "asset_type": s.get("asset_type", "unknown"),
+            "environment": s.get("environment"),
             "segment": s.get("segment"),
             "ip_category": s.get("ip_category"),
             "required_controls": s.get("required_controls", []),
         },
         "destination": {
-            "environment": d.get("environment", "UNKNOWN"),
+            "asset_type": d.get("asset_type", "unknown"),
+            "environment": d.get("environment"),
             "segment": d.get("segment"),
             "ip_category": d.get("ip_category"),
             "required_controls": d.get("required_controls", []),
@@ -137,7 +143,10 @@ def review_access(
         "policy_refs": data.get("policy_refs", []),
     }
     q = ("Cari aturan pembukaan akses berdasarkan DATA ASSESSMENT STAGE 1 berikut. "
-         "Gunakan environment source dan destination untuk menentukan aturan lintas environment; "
+            "Jika salah satu sisi asset_type endpoint/segmen LAN, gunakan aturan LAN/workstation "
+            "untuk arah tersebut dan abaikan environment endpoint; jangan terapkan aturan server S-1..S-4. "
+            "Gunakan environment hanya untuk sisi server saat aturan LAN membedakan tujuan produksi/non-produksi. "
+            "Jika kedua sisi server, gunakan environment source dan destination untuk aturan lintas environment; "
             "sebutkan secara spesifik rule yang cocok dan jangan sajikan rule untuk pasangan lain "
             "sebagai aturan yang berlaku. "
          "pertahankan klasifikasi port dan rule yang sudah diberikan, jangan menebaknya ulang. "

@@ -30,6 +30,7 @@ def _side(ip: str) -> dict:
         return {
             "ip": ip,
             "registered": False,
+            "asset_type": "unknown",
             "gate": "UNKNOWN",
             "gate_missing": [],
             "required_controls": [],
@@ -37,6 +38,7 @@ def _side(ip: str) -> dict:
             "sla": None,
         }
 
+    asset_type = "endpoint" if policies.segment_kind(asset["segment"]) == "lan" else "server"
     required = policies.required_controls(asset["environment"], asset["segment"])
     if required is None:
         missing: list[str] = []
@@ -50,9 +52,10 @@ def _side(ip: str) -> dict:
     return {
         "ip": ip,
         "registered": True,
+        "asset_type": asset_type,
         "hostname": asset["hostname"],
         "application": asset["application"],
-        "environment": asset["environment"],
+        "environment": None if asset_type == "endpoint" else asset["environment"],
         "segment": asset["segment"],
         "dc": asset["dc"],
         "ip_category": asset["ip_category"],
@@ -148,17 +151,27 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
             )
         elif side["gate"] == "FAIL":
             miss = ", ".join(side["gate_missing"])
+            context = (
+                "segmen LAN (endpoint)"
+                if side["asset_type"] == "endpoint"
+                else f"{side['environment']}/{side['segment']}"
+            )
             hard_block(
                 weight,
                 f"{label} {side['hostname']} belum memenuhi kontrol wajib "
-                f"{side['environment']}/{side['segment']}: {miss}",
+                f"{context}: {miss}",
                 "C-1..C-7",
             )
         elif side["gate"] == "UNKNOWN":
+            context = (
+                "segmen LAN (endpoint)"
+                if side["asset_type"] == "endpoint"
+                else f"{side['environment']}/{side['segment']}"
+            )
             review(
                 10,
                 f"Kontrol wajib {label} {side['hostname']} tidak dinyatakan untuk "
-                f"{side['environment']}/{side['segment']}",
+                f"{context}",
                 "C-4",
                 "kewajiban kontrol tidak dinyatakan di COMP.md",
             )
@@ -192,7 +205,7 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
     if port in {3389, 103389}:
         dst_env = dst.get("environment")
         endpoint_to_nonprod = (
-            src.get("zone") == "workstation"
+            src.get("asset_type") == "endpoint"
             and dst_env is not None
             and policies.normalize_environment(dst_env) in policies.NON_PRODUCTION
         )
@@ -239,28 +252,29 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
                 seg["rule"],
             )
 
-        env = policies.environment_rule(src["environment"], dst["environment"])
-        if env["level"] == "CONDITIONAL":
-            conditional(
-                env["points"],
-                f"Aturan environment: {env['note']}",
-                env["rule"],
-                env["note"],
-            )
-        elif env["level"] == "REVIEW":
-            review(
-                env["points"],
-                f"Aturan environment: {env['note']}",
-                env["rule"],
-                env["note"],
-            )
-        elif env["level"] == "ALLOW":
-            add(
-                0,
-                f"Environment {src['environment']} → {dst['environment']} "
-                f"sesuai aturan",
-                env["rule"],
-            )
+        if src["asset_type"] != "endpoint" and dst["asset_type"] != "endpoint":
+            env = policies.environment_rule(src["environment"], dst["environment"])
+            if env["level"] == "CONDITIONAL":
+                conditional(
+                    env["points"],
+                    f"Aturan environment: {env['note']}",
+                    env["rule"],
+                    env["note"],
+                )
+            elif env["level"] == "REVIEW":
+                review(
+                    env["points"],
+                    f"Aturan environment: {env['note']}",
+                    env["rule"],
+                    env["note"],
+                )
+            elif env["level"] == "ALLOW":
+                add(
+                    0,
+                    f"Environment {src['environment']} → {dst['environment']} "
+                    f"sesuai aturan",
+                    env["rule"],
+                )
 
     # 4. Vulnerability + SLA remediasi
     for label, side, weights in (
@@ -270,13 +284,18 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
         if not side["registered"]:
             continue
         if not side["vuln"]["scanned"]:
-            add(10, f"{label} {side['hostname']} belum memiliki data VA", "VA")
+            if side["asset_type"] != "endpoint":
+                add(10, f"{label} {side['hostname']} belum memiliki data VA", "VA")
             continue
         top = _highest(side)
         if not top:
             continue
 
-        sla = policies.sla_for(top, side["environment"], _is_public_facing(side))
+        sla = (
+            policies.sla_for(top, side["environment"], _is_public_facing(side))
+            if side["asset_type"] != "endpoint"
+            else None
+        )
         side["sla"] = sla
         if sla:
             add(
