@@ -56,6 +56,8 @@ Override model tanpa mengedit kode: `SECBOT_GEMINI_MODEL=gemini-2.5-flash`, `SEC
 Pola **supervisor router**: satu grafik state, router memilih cabang, kedua cabang
 menulis ke riwayat pesan yang sama sehingga memori percakapan tetap nyambung.
 Diagram komponen dan penjelasan alur end-to-end tersedia di [ARCHITECTURE.md](./ARCHITECTURE.md).
+Diagram arsitektur khusus lapisan AI (editable di diagrams.net) ada di
+[arsitektur-ai.drawio](./arsitektur-ai.drawio).
 
 ```mermaid
 flowchart TD
@@ -83,7 +85,7 @@ review akses. Pertanyaan seperti "IP 10.10.5.21 ada di mana?" tetap masuk rute c
 
 | Tahap | Agen | Tugas |
 |---|---|---|
-| 1 | Assessment Agent | Memanggil `assess_connection` untuk menghitung gate EDR/PAM/VA, level port, zona, severity vuln, skor risiko |
+| 1 | Assessment Agent | Memanggil `assess_connection` untuk menghitung gate sesuai `COMP.md`, aturan port `PORT.md`, segmen `NET.md`, environment `ENV.md`, severity vuln + SLA, dan skor risiko |
 | 2 | Policy Agent | Mengambil aturan relevan dari knowledge base (`search_knowledge`) |
 | 3 | Reviewer Agent | Menyusun keputusan + rekomendasi; tidak boleh lebih longgar dari `preliminary_decision` |
 
@@ -130,7 +132,7 @@ python app.py                 # buka http://127.0.0.1:5000
   LLM dan knowledge base, prosesnya bisa memakan puluhan detik; UI menampilkan
   indikator loading. Bila provider gagal, hasil deterministik tetap ditampilkan.
 - **Cek Compliance IP** (`/compliance`) — input satu IP untuk melihat status
-  `COMPLIANT`/`NON-COMPLIANT` dan kontrol wajib environment-nya. Halaman ini
+  `COMPLIANT`/`NON-COMPLIANT` dan kontrol wajib sesuai environment + segmennya. Halaman ini
   deterministik dan tidak memanggil LLM.
 
 Host/port bisa diubah lewat `WEB_HOST` dan `WEB_PORT`, misalnya
@@ -188,10 +190,12 @@ Bot > Permintaan ini terlihat seperti review pembukaan akses, tetapi datanya bel
 │   ├── assets.json         #   data aset/CMDB
 │   └── vulns.json          #   hasil scan vulnerability
 ├── knowledge/              # knowledge base .md -> masuk vector DB
-│   ├── access_policy.md
-│   ├── compliance_policy.md
-│   ├── port_guideline.md
-│   └── remediation_sla.md
+│   ├── COMP.md             #   kontrol wajib per environment/segmen
+│   ├── ENV.md              #   akses lintas environment
+│   ├── NET.md              #   aturan segmen Server Farm/DMZ
+│   ├── OS.md               #   status dukungan OS
+│   ├── PORT.md             #   aturan port P-1..P-12
+│   └── remediation_sla.md  #   SLA remediasi vulnerability
 ├── vectordb/               # vector DB Chroma (hasil `python ingest.py`, tidak di-commit)
 │   └── embedding.json      #   marker model embedding yang membuat index
 └── secbot/                 # seluruh logika aplikasi
@@ -200,9 +204,9 @@ Bot > Permintaan ini terlihat seperti review pembukaan akses, tetapi datanya bel
     ├── config.py           # provider, model, API key, lokasi folder
     ├── llm.py              # pabrik model chat & embedding per provider
     ├── datasource.py       # baca data aset & vulnerability
-    ├── policies.py         # aturan deterministik (compliance & port)
+    ├── policies.py         # aturan deterministik (compliance, port, segmen, SLA)
     ├── assessment.py       # skoring risiko pembukaan akses (dipakai CLI & UI)
-    ├── compliance.py       # cek compliance per environment (dipakai CLI & UI)
+    ├── compliance.py       # cek compliance per environment + segmen (dipakai CLI & UI)
     ├── knowledge.py        # embedding + akses vector DB
     ├── tools.py            # 5 tool agen chat
     ├── router.py           # deteksi intent + ekstraksi data permintaan akses
@@ -285,15 +289,20 @@ dan `load_vulns()` menjadi `requests.get()` ke API asli; modul lain tidak perlu 
 
 | Nama | Kegunaan |
 |---|---|
-| `REQUIRED_CONTROLS` | Kontrol wajib per environment untuk compliance harian (PROD: EDR+PAM+VA, UAT: EDR+VA, DEV: EDR) |
-| `ACCESS_REQUIRED_CONTROLS` | Kontrol wajib saat pembukaan akses (selalu EDR+PAM+VA) |
-| `PORT_RULES` | Peta port -> (nama layanan, level `PROHIBITED`/`RESTRICTED`/`ALLOWED`) |
-| `DB_PORTS` | Port database yang hanya boleh diakses dari segment APP |
+| `required_controls(env, segment)` | Matriks `COMP.md`: LAN hanya EDR; PROD Server Farm/DMZ EDR+PAM+VA; UAT EDR+VA; DEV EDR. Pre-Prod/SIT yang tidak dinyatakan -> `None` (gate `UNKNOWN`) |
+| `REQUIRED_CONTROLS` | Nilai default per environment tanpa pengecualian segmen (kompatibilitas) |
+| `classify_port(port)` | Klasifikasi `PORT.md` P-1..P-12: `PROHIBITED` (default deny) atau `RESTRICTED` (boleh dengan syarat) |
+| `PORT_RULES` | Peta port -> `(service, level, rule, note)` |
+| `MANAGEMENT_PORTS` | Port manajemen `NET.md`: 22, 3389, 445, 7001-7002 |
+| `WEB_PORTS` / `DB_PORTS` | Port web dan port database yang diatur `PORT.md` |
+| `segment_rule(...)` | Aturan segmen `NET.md` (SS-1..SS-10, WS-1..WS-3) |
+| `environment_rule(...)` | Aturan lintas environment `ENV.md` (S-1..S-4) |
+| `sla_for(...)` | SLA remediasi + prioritas dari `remediation_sla.md` |
 | `SEVERITY_ORDER` | Urutan severity dari paling berat |
 
-`REQUIRED_CONTROLS` mencerminkan `knowledge/compliance_policy.md`, dan
-`PORT_RULES`/`DB_PORTS` mencerminkan `knowledge/port_guideline.md`. Bila kebijakan
-berubah, ubah di sini **dan** di file `.md` pasangannya.
+Aturan di `policies.py` mencerminkan `knowledge/COMP.md`, `PORT.md`, `NET.md`,
+`ENV.md`, dan `remediation_sla.md`. Bila kebijakan berubah, ubah di sini **dan**
+di file `.md` pasangannya.
 
 ### `secbot/knowledge.py` - vector DB
 
@@ -322,7 +331,7 @@ dibaca LLM. Nama tool untuk LLM: `get_asset_by_ip`, `search_asset`, `get_vulns_b
 | `asset_by_ip(ip)` | `get_asset_by_ip` | Data aset (hostname, aplikasi, environment, segment, dc, EDR/PAM/VA, OS) |
 | `assets_by_keyword(kw)` | `search_asset` | Cari aset lewat nama aplikasi/hostname |
 | `vulns_by_ip(ip)` | `get_vulns_by_ip` | Jumlah temuan per severity + 10 CVE dengan CVSS tertinggi beserta solusinya |
-| `compliance_status(ip)` | `check_compliance` | Status `COMPLIANT`/`NON-COMPLIANT` sesuai environment |
+| `compliance_status(ip)` | `check_compliance` | Status `COMPLIANT`/`NON-COMPLIANT` sesuai environment + segmen; `UNKNOWN` bila kewajiban tidak dinyatakan |
 | `knowledge_lookup(q)` | `search_knowledge` | Cari kebijakan, SLA, dan panduan remediasi |
 
 Semua mengembalikan `{"error": ...}` (bukan melempar exception) bila data tidak
@@ -383,8 +392,8 @@ Bila rutenya `chat`, `pending_request` dikosongkan.
 
 | Fungsi | Kegunaan |
 |---|---|
-| `assess_connection(src_ip, dst_ip, port, protocol)` | Tool utama. Validasi input, lalu hitung skor risiko dari 4 komponen: (1) registrasi CMDB + gate EDR/PAM/VA, (2) level port, (3) zona/environment, (4) severity vulnerability. Kembalikan temuan, hard block, skor, level risiko, dan `preliminary_decision` |
-| `_side(ip)` | Profil satu sisi koneksi (source/destination): data aset + status gate + ringkasan vuln |
+| `assess_connection(src_ip, dst_ip, port, protocol)` | Tool utama. Validasi input, lalu hitung skor risiko dari: (1) registrasi CMDB + gate sesuai `COMP.md`, (2) aturan port `PORT.md` (default deny), (3) aturan segmen `NET.md`, (4) aturan environment `ENV.md`, (5) severity vulnerability + SLA. Kembalikan temuan, hard block, conditions, review reasons, policy refs, skor, level risiko, dan `preliminary_decision` |
+| `_side(ip)` | Profil satu sisi koneksi (source/destination): data aset + kontrol wajib per segmen/environment + gate + ringkasan vuln |
 | `_vuln_summary(ip)` | Ringkasan vuln: pernah discan atau belum, jumlah per severity, 5 temuan teratas |
 | `_highest(side)` | Severity paling berat pada satu sisi |
 

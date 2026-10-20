@@ -70,14 +70,17 @@ flowchart TD
 | `secbot.agents.access_tools` | Menilai permintaan jaringan: validasi, kontrol keamanan, port, zona, vulnerability, skor dan keputusan awal. |
 | `secbot.agents.access_agents` | Mengorkestrasi agen Assessment, Policy, dan Reviewer; meneruskan data assessment mentah ke Reviewer. |
 | `secbot.datasource` | Batas akses data aset dan vulnerability. Implementasi sekarang membaca JSON lokal. |
-| `secbot.policies` | Aturan operasional yang dihitung kode: compliance, kontrol akses, port dan severity. |
+| `secbot.policies` | Aturan operasional yang dihitung kode: matriks compliance (termasuk pengecualian segmen), port default-deny, aturan segmen/environment, dan SLA. |
 | `secbot.knowledge` | Membuka Chroma, membuat embedding saat pencarian, mencari potongan dokumen dan memeriksa kesesuaian model embedding. |
 | `secbot.ingest` | Membaca dokumen Markdown, memecahnya berdasarkan heading, meng-embed, dan membangun ulang Chroma. |
 | `secbot.config`, `secbot.llm` | Memuat konfigurasi serta membangun model chat dan embedding sesuai provider. |
 
 ### Topologi AI
 
-File diagram editable untuk diagrams.net: [topology-ai.drawio](./topology-ai.drawio).
+File diagram editable untuk diagrams.net:
+
+- [arsitektur-ai.drawio](./arsitektur-ai.drawio) — arsitektur khusus lapisan AI (3 halaman: arsitektur end-to-end, alur runtime, RAG & konfigurasi model).
+- [topology-ai.drawio](./topology-ai.drawio) — topologi runtime yang lebih ringkas.
 
 ```mermaid
 flowchart TB
@@ -96,7 +99,7 @@ flowchart TB
     ROUTER -->|"access_review"| ASSESSAGENT["Assessment Agent"]
     ASSESSAGENT <-->|"tool calling"| ACCESSMODEL["Chat LLM<br/>provider terpilih"]
     ASSESSAGENT --> ASSESSTOOL["assess_connection"]
-    ASSESSTOOL --> CALC["Assessment deterministik<br/>gate + port + zona + vuln + skor"]
+    ASSESSTOOL --> CALC["Assessment deterministik<br/>gate + port + segmen/env + vuln + SLA + skor"]
     CALC --> ASSET
     CALC --> COMPLIANCE
     CALC --> RAW["Hasil assessment terstruktur"]
@@ -159,14 +162,17 @@ akses membuat instance model sesuai konfigurasi saat review dijalankan.
    menyimpan nilai yang sudah terkumpul sebagai `pending_request`. Balasan berikutnya
    dapat melengkapi field tersebut; pesan lain tidak otomatis mewarisi permintaan lama.
 3. **Assessment Agent** memanggil `assess_connection`. Kode memvalidasi input dan
-   menghitung status registrasi CMDB, gate EDR/PAM/VA, risiko port, zona/environment,
-   dampak vulnerability, skor risiko, hard block, dan `preliminary_decision`.
+   menghitung status registrasi CMDB, gate kontrol wajib sesuai matriks `COMP.md`
+   (termasuk pengecualian segmen LAN dan non-produksi), aturan port `PORT.md`
+   (default deny), aturan segmen `NET.md`, aturan lintas environment `ENV.md`,
+   dampak vulnerability beserta SLA, skor risiko, hard block, dan
+   `preliminary_decision`.
 4. **Policy Agent** mencari aturan terkait pada knowledge base, termasuk kebijakan
    akses, pedoman port, serta aturan zona dan vulnerability.
 5. **Reviewer Agent** merangkai assessment dan kutipan aturan menjadi keputusan serta
-   rekomendasi. Keputusan yang ditulis tidak boleh lebih longgar dari
-   `preliminary_decision`; nilai assessment diambil dari output tool, bukan ringkasan
-   Assessment Agent.
+   rekomendasi, termasuk syarat dari `conditions`/`review_reasons` dan SLA remediasi.
+   Keputusan yang ditulis tidak boleh lebih longgar dari `preliminary_decision`;
+   nilai assessment diambil dari output tool, bukan ringkasan Assessment Agent.
 
 Penilaian dan keputusan awal adalah deterministik di kode. LLM bertugas memilih tool,
 mengambil/merangkum aturan berbasis dokumen, dan menjelaskan hasil kepada pengguna.

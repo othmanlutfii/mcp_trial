@@ -6,9 +6,9 @@ Router di dalam grafik yang memilih rutenya, jadi pengguna cukup menulis pertany
 - :mod:`secbot.config`     pengaturan provider/model (ollama, gemini, deepseek) dan lokasi folder
 - :mod:`secbot.llm`        pabrik model chat & embedding per provider
 - :mod:`secbot.datasource` baca data aset/vulnerability (dummy JSON, siap diganti API)
-- :mod:`secbot.policies`   aturan bisnis deterministik (compliance & port)
+- :mod:`secbot.policies`   aturan bisnis deterministik (compliance, port, segmen, environment, SLA)
 - :mod:`secbot.assessment` skoring risiko pembukaan akses (dipakai CLI & UI web)
-- :mod:`secbot.compliance` cek compliance per environment (dipakai CLI & UI web)
+- :mod:`secbot.compliance` cek compliance per environment + segmen (dipakai CLI & UI web)
 - :mod:`secbot.knowledge`  akses vector DB knowledge base
 - :mod:`secbot.tools`      5 tool agen chat
 - :mod:`secbot.router`     deteksi intent + ekstraksi data permintaan akses

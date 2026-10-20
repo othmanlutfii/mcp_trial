@@ -33,16 +33,18 @@ ATURAN KERAS:
 - Jangan mengarang data. Gunakan hanya angka dan fakta dari DATA ASSESSMENT dan ATURAN.
 - Keputusanmu TIDAK BOLEH lebih longgar dari preliminary_decision. Urutan ketat -> longgar:
   DENY, REVIEW_REQUIRED, APPROVE_WITH_CONDITIONS, APPROVE.
+- Jika DATA ASSESSMENT memuat conditions atau review_reasons, sebutkan sebagai syarat
+  yang wajib dipenuhi; jangan menyatakan APPROVE tanpa memenuhinya.
 - Rekomendasi harus konkret dan merujuk pada temuan (IP/hostname/CVE/port).
 
 FORMAT JAWABAN:
 1. Keputusan: <keputusan> | Risiko: <level> (skor)
 2. Ringkasan singkat (2-3 kalimat)
-3. Compliance (EDR/PAM/VA) source dan destination
-4. Severity vulnerability source dan destination
-5. Penilaian port dan zona
+3. Compliance (EDR/PAM/VA) source dan destination sesuai required_controls
+4. Severity vulnerability source dan destination + SLA remediasi
+5. Penilaian port, segmen, dan environment (sebutkan rule ID yang relevan)
 6. Rekomendasi (daftar bernomor: perbaikan, modifikasi permintaan, alternatif yang lebih aman)
-7. Referensi kebijakan (nama file)"""
+7. Referensi kebijakan (nama file knowledge + policy_refs)"""
 
 
 def _llm():
@@ -110,10 +112,38 @@ def review_access(
     # Tahap 2: aturan dari knowledge (query diperkaya konteks hasil assessment)
     log("[2/3] Policy Agent: mengambil aturan dari knowledge...")
     s, d = data["source"], data["destination"]
-    q = (f"Cari aturan pembukaan akses untuk port {port}/{protocol} ({data['port_info']['service']}), "
-         f"dari segment {s.get('segment', '?')} ({s.get('ip_category', '?')}) "
-         f"ke segment {d.get('segment', '?')} environment {d.get('environment', '?')}. "
-         f"Sertakan syarat wajib server, pedoman port, aturan zona, dan dampak vulnerability.")
+    policy_context = {
+        "source": {
+            "environment": s.get("environment", "UNKNOWN"),
+            "segment": s.get("segment"),
+            "ip_category": s.get("ip_category"),
+            "required_controls": s.get("required_controls", []),
+        },
+        "destination": {
+            "environment": d.get("environment", "UNKNOWN"),
+            "segment": d.get("segment"),
+            "ip_category": d.get("ip_category"),
+            "required_controls": d.get("required_controls", []),
+        },
+        "port_info": {
+            "port": port,
+            "protocol": protocol,
+            "service": data["port_info"].get("service"),
+            "level": data["port_info"].get("level"),
+            "rule": data["port_info"].get("rule"),
+        },
+        "conditions": data.get("conditions", []),
+        "review_reasons": data.get("review_reasons", []),
+        "policy_refs": data.get("policy_refs", []),
+    }
+    q = ("Cari aturan pembukaan akses berdasarkan DATA ASSESSMENT STAGE 1 berikut. "
+         "Gunakan environment source dan destination untuk menentukan aturan lintas environment; "
+            "sebutkan secara spesifik rule yang cocok dan jangan sajikan rule untuk pasangan lain "
+            "sebagai aturan yang berlaku. "
+         "pertahankan klasifikasi port dan rule yang sudah diberikan, jangan menebaknya ulang. "
+         "Cari syarat wajib server, pedoman port, aturan zona, dan dampak vulnerability. "
+         "Prioritaskan policy_refs yang tercantum dan sebutkan nama file sumber tiap aturan.\n"
+         f"{json.dumps(policy_context, ensure_ascii=False, indent=2)}")
     policy_text = message_text(_run(policy_agent, q)[-1])
 
     # Tahap 3: penilaian dan rekomendasi

@@ -184,6 +184,7 @@ button:hover { background: var(--accent-dark); }
 .decision-deny,
 .decision-non-compliant { color: var(--red); }
 .decision-compliant { color: var(--green); }
+.decision-unknown { color: var(--muted); }
 
 .score {
   display: grid;

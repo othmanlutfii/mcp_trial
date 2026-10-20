@@ -1,0 +1,602 @@
+<mxfile host="app.diagrams.net" modified="2026-10-20T20:52:38" agent="Copilot" version="24.7.17" type="device">
+  <diagram id="ai-architecture" name="1 · Arsitektur AI">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1420" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="p1-title" value="ARSITEKTUR AI — SECURITY BOT" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#16324F;fontSize=26;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="14" width="1100" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="p1-sub" value="LangGraph supervisor · ReAct chat agent · pipeline 3 agen · RAG Chroma · multi-provider LLM" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="1100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="p1-legend" value="Legenda   ─── aliran data / pemanggilan     ┈┈┈ pemakaian model atau konfigurasi" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#64748B;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="20" width="480" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="p1-legend2" value="Warna: biru = antarmuka/chat · hijau = orkestrasi · oranye = review akses · merah = deterministik · ungu = model · teal = knowledge" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#64748B;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="45" width="700" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="b1" value="1 · ANTARMUKA" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#DAE8FC;swimlaneFillColor=#FFFFFF;strokeColor=#6C8EBF;fontColor=#6C8EBF;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="100" width="1860" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="user" value="Pengguna tim security&#xa;pertanyaan / permintaan akses" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="140" width="130" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="cli" value="CLI Python&#xa;main.py · python -m secbot" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;fontSize=12;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="140" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="web" value="Web UI Flask (app.py)&#xa;/   ·   /compliance" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;fontSize=12;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="140" width="300" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="compl" value="Halaman /compliance&#xa;compliance_status() — tanpa LLM" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="830" y="140" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n1" value="Di UI: assess_connection_data() dihitung lebih dulu, lalu review_access(assessment=…) dipanggil — tahap Assessment Agent dilewati sehingga hemat satu putaran LLM." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="138" width="750" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="2 · ORKESTRASI AI — LangGraph Supervisor · secbot/graph.py" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#D5E8D4;swimlaneFillColor=#FFFFFF;strokeColor=#82B366;fontColor=#82B366;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="250" width="1860" height="215" as="geometry"/>
+        </mxCell>
+        <mxCell id="state" value="BotState&#xa;messages · route&#xa;request · pending_request&#xa;&#xa;MemorySaver&#xa;thread_id = sesi percakapan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="300" width="250" height="135" as="geometry"/>
+        </mxCell>
+        <mxCell id="start" value="START" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=12;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="340" width="80" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="router" value="Router Node&#xa;secbot/router.py&#xa;&#xa;aturan deterministik dulu&#xa;LLM hanya fallback" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="295" width="270" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="n2" value="Satu riwayat percakapan dipakai kedua rute. Bila data akses belum lengkap, router menyimpan pending_request; balasan user berikutnya boleh melengkapi field. Pesan yang tidak menjawab klarifikasi tidak mewarisi permintaan lama." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="295" width="810" height="125" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3a" value="3A · JALUR CHAT — ReAct Agent + 5 tool · secbot/chat.py" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#E8F2FF;swimlaneFillColor=#FFFFFF;strokeColor=#4A86C5;fontColor=#4A86C5;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="480" width="880" height="450" as="geometry"/>
+        </mxCell>
+        <mxCell id="agent" value="ReAct Chat Agent&#xa;secbot/chat.py&#xa;SYSTEM_PROMPT + tool calling" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=12;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="535" width="220" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="tools" value="Tools Informasi · secbot/tools.py" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#E8F2FF;swimlaneFillColor=#FFFFFF;strokeColor=#4A86C5;fontColor=#4A86C5;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="520" width="560" height="270" as="geometry"/>
+        </mxCell>
+        <mxCell id="t1" value="get_asset_by_ip&#xa;aset per IP · data/assets.json" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="345" y="560" width="245" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="t2" value="search_asset&#xa;cari aplikasi / hostname" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="610" y="560" width="245" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="t3" value="get_vulns_by_ip&#xa;CVE + severity · data/vulns.json" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="345" y="628" width="245" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="t4" value="check_compliance&#xa;EDR / PAM / VA · policies.py" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="610" y="628" width="245" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="t5" value="search_knowledge&#xa;RAG · Chroma vectordb" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="345" y="696" width="245" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="t6" value="Output tool dikembalikan apa adanya; LLM tidak menghitung data." style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="610" y="696" width="245" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="answer" value="Jawaban + sumber&#xa;data aset · VA · nama file" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="800" width="220" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n3" value="Loop ReAct: pilih tool → baca hasil → ulangi bila perlu → susun jawaban. Prompt melarang klaim tanpa hasil tool." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="320" y="805" width="560" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3b" value="3B · JALUR REVIEW AKSES — pipeline 3 agen · secbot/agents/" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#FFE6CC;swimlaneFillColor=#FFFFFF;strokeColor=#D79B00;fontColor=#D79B00;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="940" y="480" width="950" height="450" as="geometry"/>
+        </mxCell>
+        <mxCell id="assess" value="1 · Assessment Agent&#xa;create_react_agent&#xa;(prompt: hanya panggil tool)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="965" y="525" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="assess_tool" value="assess_connection&#xa;@tool → assess_connection_data" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="525" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="engine" value="Assessment deterministik — secbot/assessment.py&#xa;CMDB · gate EDR/PAM/VA · level port · zona/environment · severity vuln&#xa;→ findings · hard_blocks · risk_score · preliminary_decision" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1365" y="515" width="475" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="policy" value="2 · Policy Agent&#xa;create_react_agent&#xa;2–3 query berbeda" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="965" y="620" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="rag" value="search_knowledge&#xa;k=3 potongan + nama file" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="620" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="reviewer" value="3 · Reviewer&#xa;llm.invoke (tanpa tool)&#xa;JSON mentah + aturan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="965" y="735" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="guard" value="Guardrail keputusan&#xa;DENY &gt; REVIEW_REQUIRED &gt;&#xa;APPROVE_WITH_CONDITIONS &gt; APPROVE&#xa;(tidak boleh lebih longgar)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="725" width="250" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="final" value="Jawaban akhir&#xa;Keputusan · risiko · compliance · vuln&#xa;port/zona · rekomendasi · referensi" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1455" y="725" width="385" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="n4" value="Data assessment diambil dari ToolMessage (JSON mentah), bukan ringkasan LLM. Keputusan awal dihitung kode." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="835" width="665" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="4 · PLATFORM AI — model, embedding, vector DB, konfigurasi" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#9673A6;fontColor=#9673A6;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="965" width="1860" height="205" as="geometry"/>
+        </mxCell>
+        <mxCell id="chatg" value="Chat LLM · tool calling" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#9673A6;fontColor=#9673A6;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1005" width="660" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="factory" value="build_chat_model()&#xa;secbot/llm.py" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="85" y="1045" width="170" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="ollama" value="Ollama · qwen3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="285" y="1038" width="175" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="gemini" value="Gemini · gemini-3.5-flash-lite" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="285" y="1078" width="175" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="deepseek" value="DeepSeek · deepseek-flash" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="285" y="1118" width="175" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="n5" value="Dipilih SECBOT_PROVIDER.&#xa;Temperature 0; THINKING&#xa;mengatur mode penalaran." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1045" width="215" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="cfgg" value="Konfigurasi" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#D6B656;fontColor=#D6B656;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1005" width="310" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="config" value=".env / environment&#xa;config.py&#xa;SECBOT_PROVIDER · model · API key&#xa;temperature · THINKING&#xa;SECBOT_EMBED_PROVIDER" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="765" y="1042" width="260" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="embg" value="Embedding" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#9673A6;fontColor=#9673A6;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="1005" width="330" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="embf" value="build_embeddings()" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1095" y="1045" width="150" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="embo" value="Ollama · bge-m3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="1040" width="120" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="embg2" value="Gemini · embedding-001" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="1086" width="120" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="vecg" value="Knowledge / vector store" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#B1DDF0;swimlaneFillColor=#FFFFFF;strokeColor=#10739E;fontColor=#10739E;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="1005" width="440" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="ingest" value="python ingest.py&#xa;markdown → chunk → embed" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1445" y="1045" width="150" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="chroma" value="vectordb/&#xa;Chroma" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1615" y="1045" width="125" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="marker" value="embedding.json&#xa;penanda model" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1755" y="1045" width="100" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="5 · SUMBER DATA &amp; KNOWLEDGE — source of truth" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#F5F5F5;swimlaneFillColor=#FFFFFF;strokeColor=#666666;fontColor=#666666;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1200" width="1860" height="185" as="geometry"/>
+        </mxCell>
+        <mxCell id="assets" value="data/assets.json&#xa;CMDB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1238" width="170" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="vulns" value="data/vulns.json&#xa;hasil VA" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1295" width="170" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="datasource" value="secbot/datasource.py&#xa;load_assets · load_vulns&#xa;find_asset · find_vulns" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="1250" width="190" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="policies" value="secbot/policies.py&#xa;port · kontrol · severity" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="1255" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="compliance" value="secbot/compliance.py&#xa;compliance_status()" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1255" width="160" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="n6" value="Dipakai oleh 5 tool chat, assess_connection (CMDB + VA + aturan), dan check_compliance. Setelah .md berubah atau model embedding diganti, jalankan python ingest.py." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="900" y="1250" width="540" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="kdocs" value="knowledge/*.md&#xa;6 dokumen" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1480" y="1258" width="200" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_u_cli" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="user" target="cli">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_u_web" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="web">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="125" y="228"/><mxPoint x="650" y="228"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_cli_start" value="pesan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cli" target="start">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="345" y="240"/><mxPoint x="390" y="240"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_web_start" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="web" target="start">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="650" y="232"/><mxPoint x="410" y="232"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_start_router" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.45;entryDx=0;entryDy=0;" edge="1" parent="1" source="start" target="router">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_state_router" value="state" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;startArrow=block;startFill=1;exitX=1;exitY=0.45;exitDx=0;exitDy=0;entryX=0;entryY=0.45;entryDx=0;entryDy=0;" edge="1" parent="1" source="router" target="state">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_router_chat" value="route = chat" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.48;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="router" target="agent">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="600" y="460"/><mxPoint x="170" y="460"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_router_access" value="route = access_review" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.78;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="router" target="assess">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="680" y="460"/><mxPoint x="1055" y="460"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_agent_tools" value="tool calling" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;startArrow=block;startFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="agent" target="tools">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_agent_answer" value="susun jawaban" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="agent" target="answer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_agent_model" value="generate + tool calling" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=1;exitY=0.78;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="agent" target="factory">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="300" y="610"/><mxPoint x="300" y="945"/><mxPoint x="170" y="945"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_assess_tool" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="assess" target="assess_tool">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_tool_engine" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B85450;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="assess_tool" target="engine">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_assess_policy" value="output: data assessment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="assess" target="policy">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_policy_reviewer" value="output: kutipan aturan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="policy" target="reviewer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_policy_rag" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="policy" target="rag">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_rag_reviewer" value="aturan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="rag" target="reviewer">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1160" y="660"/><mxPoint x="1160" y="775"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_reviewer_guard" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reviewer" target="guard">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_guard_final" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="guard" target="final">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_engine_reviewer" value="DATA ASSESSMENT JSON mentah" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B85450;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="engine" target="reviewer">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1862" y="565"/><mxPoint x="1862" y="900"/><mxPoint x="1055" y="900"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_reviewer_model" value="semua agen → chat model" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.9;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="reviewer" target="chatg">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="950" y="775"/><mxPoint x="950" y="945"/><mxPoint x="650" y="945"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_rag_vector" value="similarity search k=3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.045;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="rag" target="vecg">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1440" y="660"/><mxPoint x="1440" y="1005"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_fac_ollama" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="factory" target="ollama">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="270" y="1088"/><mxPoint x="270" y="1055"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_fac_gemini" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="factory" target="gemini">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="270" y="1088"/><mxPoint x="270" y="1095"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_fac_deepseek" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="factory" target="deepseek">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="270" y="1088"/><mxPoint x="270" y="1135"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_cfg_chat" value="config.py" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="config" target="chatg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_cfg_emb" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="config" target="embg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_emb_vec" value="embedding" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="embg" target="vecg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_ingest_chroma" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ingest" target="chroma">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_md_ingest" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.9;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="kdocs" target="ingest">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1580" y="1145"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_ds_assets" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#666666;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.3;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="datasource" target="assets">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="245" y="1275"/><mxPoint x="245" y="1263"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_ds_vulns" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#666666;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.65;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="datasource" target="vulns">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="245" y="1305"/><mxPoint x="245" y="1320"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e_pol_comp" value="aturan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#666666;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="policies" target="compliance">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ai-runtime" name="2 · Alur Runtime AI">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="p2-title" value="ALUR RUNTIME AI — ROUTING, CHAT, DAN PIPELINE 3 AGEN" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#16324F;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="14" width="1200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2-sub" value="Dari pesan pengguna sampai jawaban: deterministik dulu, LLM untuk pemilihan tool, peringkasan aturan, dan narasi." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="1500" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="user2" value="Pesan pengguna&#xa;pertanyaan / permintaan akses" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="240" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="router2" value="Router Node&#xa;extract_request → is_complete&#xa;→ has_access_intent" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="300" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec2" value="Rute?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="75" width="300" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="laneA" value="JALUR A · CHAT — pertanyaan informasi" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#E8F2FF;swimlaneFillColor=#FFFFFF;strokeColor=#4A86C5;fontColor=#4A86C5;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="270" width="1800" height="230" as="geometry"/>
+        </mxCell>
+        <mxCell id="a1" value="ReAct Chat Agent&#xa;pilih tool sesuai pertanyaan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="330" width="240" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2" value="Tool 1..n (5 tool)&#xa;aset · CVE · compliance · knowledge" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="400" y="330" width="280" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" value="LLM menyusun jawaban&#xa;hanya dari hasil tool + sumber" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E8F2FF;strokeColor=#4A86C5;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="330" width="300" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4" value="Jawaban + sumber" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="330" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="a5" value="END&#xa;state percakapan tersimpan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="330" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="laneB" value="JALUR B · REVIEW AKSES — pipeline 3 agen + guardrail" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#FFE6CC;swimlaneFillColor=#FFFFFF;strokeColor=#D79B00;fontColor=#D79B00;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="1800" height="560" as="geometry"/>
+        </mxCell>
+        <mxCell id="b0" value="Data lengkap?&#xa;src · dst · port" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="610" width="240" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="b1" value="Minta klarifikasi&#xa;simpan pending_request" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="800" width="240" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="1 · Assessment Agent&#xa;assess_connection" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="620" width="250" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2n" value="UI web: assessment sudah dihitung&#xa;→ tahap ini dilewati" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="400" y="740" width="250" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="Assessment deterministik&#xa;CMDB · EDR/PAM/VA · port · zona · vuln&#xa;→ skor + preliminary_decision" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="610" width="320" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="2 · Policy Agent&#xa;search_knowledge ×2–3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="620" width="250" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="RAG Chroma&#xa;k=3 potongan + sumber" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="620" width="260" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="b6" value="3 · Reviewer&#xa;JSON mentah + kutipan aturan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="810" width="250" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="b7" value="Guardrail&#xa;keputusan ≤ preliminary_decision" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="810" width="260" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="b8" value="Jawaban final&#xa;keputusan · risiko · rekomendasi · referensi" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="950" width="260" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="end2" value="END" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=11;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="950" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="user2" target="router2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="router2" target="dec2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e3" value="chat / informasi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dec2" target="a1">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="890" y="240"/><mxPoint x="220" y="240"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e4" value="akses / 2 IP + port / keyword" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dec2" target="b0">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1100" y="140"/><mxPoint x="1820" y="140"/><mxPoint x="1820" y="520"/><mxPoint x="220" y="520"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e5" value="tool calling" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;startArrow=block;startFill=1;" edge="1" parent="1" source="a1" target="a2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="a2" target="a3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="a3" target="a4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#4A86C5;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="a4" target="a5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e9" value="ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="b0" target="b2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e10" value="tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b0" target="b1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e11" value="giliran berikutnya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="b1" target="user2">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="40" y="840"/><mxPoint x="40" y="180"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b2" target="b3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e13" value="stage 1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b3" target="b4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b4" target="b5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e15" value="DATA ASSESSMENT mentah" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B85450;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.12;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b3" target="b6">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="860" y="760"/><mxPoint x="1100" y="760"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e16" value="aturan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.15;exitY=1;exitDx=0;exitDy=0;entryX=0.88;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b5" target="b6">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1410" y="760"/><mxPoint x="1290" y="760"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D79B00;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b6" target="b7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b7" target="b8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_e19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#82B366;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b8" target="end2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2-note" value="Poin kunci: router memakai aturan deterministik lebih dulu; semua angka dihitung kode; LLM memilih tool, merangkum aturan, lalu menyusun narasi keputusan." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1135" width="1800" height="34" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ai-rag" name="3 · RAG &amp; Konfigurasi Model">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="p3-title" value="KNOWLEDGE (RAG), MODEL, DAN GUARDRAIL" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#16324F;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="14" width="1200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3-sub" value="Cara index dibangun dan dipakai saat runtime, provider model yang didukung, serta prinsip determinisme AI." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="1400" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="ing" value="A · INGEST KNOWLEDGE (offline) — python ingest.py" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#B1DDF0;swimlaneFillColor=#FFFFFF;strokeColor=#10739E;fontColor=#10739E;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="90" width="1860" height="250" as="geometry"/>
+        </mxCell>
+        <mxCell id="i1" value="knowledge/*.md&#xa;COMP · ENV · NET · OS · PORT · SLA" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="170" width="220" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="i2" value="load_documents()&#xa;baca semua .md" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="170" width="220" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="i3" value="MarkdownHeaderTextSplitter&#xa;heading # dan ##" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="560" y="170" width="220" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="i4" value="chunk + metadata&#xa;judul · bagian · sumber" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="810" y="170" width="220" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="i5" value="model embedding aktif&#xa;build_embeddings()" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="170" width="220" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="i6" value="Chroma.from_documents&#xa;rebuild dari nol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="170" width="220" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="i7" value="vectordb/&#xa;Chroma + embedding.json" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="170" width="260" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_ei1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="i1" target="i2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_ei2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="i2" target="i3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_ei3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="i3" target="i4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_ei4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="i4" target="i5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_ei5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="i5" target="i6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_ei6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="i6" target="i7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3-n1" value="Index dibangun ulang setiap dokumen berubah atau provider/model embedding diganti. Marker embedding.json mencegah retrieval memakai index dari model yang berbeda." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="275" width="1760" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="ret" value="B · RETRIEVAL SAAT RUNTIME — search_knowledge() / search_documents()" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#B1DDF0;swimlaneFillColor=#FFFFFF;strokeColor=#10739E;fontColor=#10739E;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="370" width="1860" height="290" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1" value="query dari agent&#xa;Policy Agent / chat" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="450" width="230" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2" value="index_problem()&#xa;cek index + marker" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="320" y="450" width="230" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3" value="embedding query&#xa;model harus sama" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="580" y="450" width="230" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="r4" value="similarity_search&#xa;k=3 (default)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="450" width="260" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="r5" value="hasil: sumber · bagian · isi" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="450" width="260" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="r6" value="konteks agent&#xa;kutipan aturan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="450" width="180" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="r7" value="lru_cache(128)&#xa;init Chroma thread-safe" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1630" y="450" width="230" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="rerr" value="marker tidak cocok → pesan actionable:&#xa;jalankan ulang python ingest.py" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;fontSize=9;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="560" width="490" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r1_r2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="r1" target="r2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r2_r3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="r2" target="r3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r3_r4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="r3" target="r4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r4_r5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="r4" target="r5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r5_r6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#10739E;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="r5" target="r6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r2_err" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B85450;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="r2" target="rerr">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_r4_cache" value="cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="r4" target="r7">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="970" y="620"/><mxPoint x="1745" y="620"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="mdl" value="C · MODEL &amp; KONFIGURASI — secbot/llm.py · secbot/config.py" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#9673A6;fontColor=#9673A6;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="690" width="1860" height="250" as="geometry"/>
+        </mxCell>
+        <mxCell id="cg" value="Chat · tool calling" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#9673A6;fontColor=#9673A6;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="740" width="580" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="cf" value="build_chat_model()" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="85" y="790" width="160" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="co" value="Ollama — ChatOllama · qwen3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="270" y="782" width="340" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="cge" value="Gemini — ChatGoogleGenerativeAI" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="270" y="826" width="340" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="cd" value="DeepSeek — ChatDeepSeek" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="270" y="870" width="340" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="eg" value="Embedding" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#9673A6;fontColor=#9673A6;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="670" y="740" width="520" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="ef" value="build_embeddings()" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="695" y="790" width="150" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="eo" value="Ollama — bge-m3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="870" y="782" width="295" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="ege" value="Gemini — embedding-001" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="870" y="826" width="295" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3-n2" value="DeepSeek tidak menyediakan embedding:&#xa;embedding memakai Ollama atau Gemini." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#526477;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="870" y="866" width="295" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="envg" value=".env / environment" style="swimlane;html=1;startSize=28;horizontal=1;rounded=1;collapsible=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#D6B656;fontColor=#D6B656;fontSize=11;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="740" width="640" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="env" value="SECBOT_PROVIDER · SECBOT_LLM_MODEL · API keys (Gemini / DeepSeek)&#xa;SECBOT_TEMPERATURE=0 · SECBOT_THINKING · SECBOT_EMBED_PROVIDER" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1245" y="790" width="590" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_cf_co" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cf" target="co">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="258" y="835"/><mxPoint x="258" y="799"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p3_ef_eo" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#9673A6;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ef" target="eo">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="857" y="835"/><mxPoint x="857" y="799"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p3_cg_env" value="dibaca config.py" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="env" target="cg">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1210" y="835"/><mxPoint x="1210" y="930"/><mxPoint x="640" y="930"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="p3_eg_env" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D6B656;strokeWidth=1.5;fontSize=10;fontColor=#334155;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="env" target="eg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="pri" value="D · PRINSIP &amp; GUARDRAIL AI" style="swimlane;html=1;startSize=32;horizontal=1;rounded=1;collapsible=0;fillColor=#F5F5F5;swimlaneFillColor=#FFFFFF;strokeColor=#666666;fontColor=#666666;fontSize=14;fontStyle=1;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="970" width="1860" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="g1" value="Deterministik dulu&#xa;angka, port, zona, skor, dan keputusan awal dihitung kode." style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F8CECC;strokeColor=#B85450;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1030" width="430" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="g2" value="LLM untuk bahasa&#xa;pemilihan tool, peringkasan aturan, dan narasi keputusan." style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="1030" width="430" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="g3" value="Data mentah&#xa;Reviewer menerima JSON ToolMessage, bukan ringkasan agen." style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#B1DDF0;strokeColor=#10739E;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="1030" width="430" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="g4" value="Keputusan konservatif&#xa;DENY &gt; REVIEW_REQUIRED &gt; APPROVE_WITH_CONDITIONS &gt; APPROVE." style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#1F2937;fontSize=10;verticalAlign=middle;spacing=4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="1030" width="450" height="95" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

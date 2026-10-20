@@ -15,12 +15,29 @@ def compliance_status(ip: str) -> dict:
         return {"error": f"Aset dengan IP {ip} tidak ditemukan"}
 
     env = asset["environment"]
-    wajib = policies.REQUIRED_CONTROLS.get(env, [])
+    segment = asset["segment"]
+    wajib = policies.required_controls(env, segment)
+    if wajib is None:
+        return {
+            "ip": ip,
+            "hostname": asset["hostname"],
+            "environment": env,
+            "segment": segment,
+            "kontrol_wajib": [],
+            "kontrol_belum_terpenuhi": [],
+            "status": "UNKNOWN",
+            "catatan": (
+                f"Kewajiban kontrol untuk environment {env} tidak dinyatakan "
+                "di knowledge/COMP.md"
+            ),
+        }
+
     kurang = [k.upper() for k in wajib if not asset.get(k)]
     return {
         "ip": ip,
         "hostname": asset["hostname"],
         "environment": env,
+        "segment": segment,
         "kontrol_wajib": [k.upper() for k in wajib],
         "kontrol_belum_terpenuhi": kurang,
         "status": "COMPLIANT" if not kurang else "NON-COMPLIANT",

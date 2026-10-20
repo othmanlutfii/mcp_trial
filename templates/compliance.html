@@ -6,7 +6,7 @@
 <section class="page-head">
   <p class="eyebrow">Daily Compliance</p>
   <h1>Cek Compliance IP</h1>
-  <p class="muted">Masukkan IP server untuk memeriksa kontrol wajib sesuai environment-nya.</p>
+  <p class="muted">Masukkan IP server untuk memeriksa kontrol wajib sesuai environment dan segmennya.</p>
 </section>
 
 <form method="post" class="card form-card" autocomplete="off">
@@ -37,8 +37,8 @@
       <p class="muted mono">{{ result.hostname }} · {{ result.ip }} · {{ result.environment }}</p>
     </div>
     <div class="score">
-      <span class="score-value">{{ terpenuhi }}/{{ result.kontrol_wajib|length }}</span>
-      <span class="score-label">Kontrol wajib terpenuhi</span>
+      <span class="score-value">{% if result.status == 'UNKNOWN' %}—{% else %}{{ terpenuhi }}/{{ result.kontrol_wajib|length }}{% endif %}</span>
+      <span class="score-label">{% if result.status == 'UNKNOWN' %}Kontrol wajib tidak dinyatakan{% else %}Kontrol wajib terpenuhi{% endif %}</span>
     </div>
   </div>
 
@@ -55,7 +55,12 @@
         {% endfor %}
       </div>
 
-      {% if result.kontrol_belum_terpenuhi %}
+      {% if result.status == 'UNKNOWN' %}
+      <div class="alert alert-error compact">
+        <strong>Tidak dapat ditentukan</strong>
+        <p>{{ result.catatan }}</p>
+      </div>
+      {% elif result.kontrol_belum_terpenuhi %}
       <div class="alert alert-error compact">
         <strong>Belum terpenuhi</strong>
         <p>{{ result.kontrol_belum_terpenuhi|join(', ') }}</p>
@@ -77,7 +82,7 @@
         <dt>DC</dt><dd>{{ asset.dc }}</dd>
         <dt>Operating System</dt><dd>{{ asset.operating_system }}</dd>
       </dl>
-      <p class="subhead">Kontrol wajib untuk {{ result.environment }}</p>
+      <p class="subhead">Kontrol wajib untuk {{ result.environment }} / {{ result.segment }}</p>
       <div class="chips">
         {% for control in result.kontrol_wajib %}
         <span class="chip">{{ control }}</span>
