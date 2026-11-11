@@ -125,6 +125,6 @@ Policy: Network Segment Security Policy. Category: Workstation to Server.
 Source: LAN Campus (workstation).
 Destination: IP Data, IP Management, or IP VS - DMZ.
 Default: all access is blocked (default deny).
-Required action: must be redirected to use the forwarding mechanism or IP F5 to the Server Farm segment.
+Required action: must be redirected through the forwarding mechanism or IP F5 to the Server Farm segment. The Server Farm destination may be an IP Data/VS address or an IP Management address; the applicable Server Farm rule (WS-1 or WS-2), port policy, and environment policy still apply.
 Note: the DMZ segment is isolated from users, so direct access is not permitted. The exception applies only to appliance devices on the DMZ that cannot use the F5 or forwarding mechanism.
-Summary: LAN Campus cannot access the DMZ directly. Access must go through the forwarding mechanism or IP F5 to the Server Farm segment, except for appliance devices on the DMZ that cannot use F5 or forwarding.
+Summary: LAN Campus cannot access the DMZ directly. Access must go through the forwarding mechanism or IP F5 to the Server Farm segment, targeting IP Data/VS or IP Management as permitted by WS-1/WS-2 and the applicable port/environment policies. The exception applies only to appliance devices on the DMZ that cannot use F5 or forwarding.

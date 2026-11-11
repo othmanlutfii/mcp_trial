@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Splunk · Security Bot{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="eyebrow">Asset Inventory</p>
+  <h1>Asset Splunk</h1>
+  <p class="muted">Data ditampilkan dari database lokal. Halaman ini tidak menjalankan query Splunk saat dibuka.</p>
+</section>
+
+<section class="card">
+  <div class="summary-columns">
+    <div>
+      <h2>Sinkronisasi</h2>
+      {% if current_run %}
+      <p>Proses #{{ current_run.id }}: <strong>{{ current_run.status }}</strong>
+        {% if current_run.sid %}· SID {{ current_run.sid }}{% endif %}</p>
+      {% elif last_sync %}
+      <p>Terakhir: <strong>{{ last_sync.status }}</strong> · {{ last_sync.finished_at or last_sync.started_at }}</p>
+      {% else %}
+      <p>Belum ada proses sinkronisasi.</p>
+      {% endif %}
+      {% if last_sync %}
+      <p>{{ last_sync.rows_received }} baris · {{ last_sync.inserted_count }} baru ·
+        {{ last_sync.updated_count }} diperbarui</p>
+      {% if last_sync.error_message %}<p class="alert alert-error">{{ last_sync.error_message }}</p>{% endif %}
+      {% endif %}
+      <p class="muted">Jalankan sinkronisasi melalui endpoint API yang terproteksi.</p>
+    </div>
+    <div>
+      <h2>Data tersimpan</h2>
+      <p>{{ total }} aset tersimpan. Pembaruan tidak menghapus aset yang tidak muncul di hasil sync terbaru.</p>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <form method="get" class="field-grid">
+    <label>
+      Cari
+      <input type="search" name="q" value="{{ search }}" placeholder="IP, hostname, segment, PIC">
+    </label>
+    <label>
+      Environment
+      <input type="text" name="environment" value="{{ environment }}" placeholder="PROD">
+    </label>
+    <input type="hidden" name="per_page" value="{{ per_page }}">
+    <div><button type="submit">Filter</button></div>
+  </form>
+  <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>IP</th><th>Hostname</th><th>Asset type</th><th>EDR</th><th>PAM</th>
+          <th>Splunk</th><th>VA</th><th>Segment</th><th>Category</th>
+          <th>Environment</th><th>OS version</th><th>PIC</th><th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for asset in assets %}
+        <tr>
+          <td>{{ asset.ip or "" }}</td><td>{{ asset.hostname or "" }}</td>
+          <td>{{ asset.asset_type or "" }}</td>
+          <td>{{ "Ya" if asset.edr == 1 else "Tidak" if asset.edr == 0 else "-" }}</td>
+          <td>{{ "Ya" if asset.pam == 1 else "Tidak" if asset.pam == 0 else "-" }}</td>
+          <td>{{ "Ya" if asset.splunk == 1 else "Tidak" if asset.splunk == 0 else "-" }}</td>
+          <td>{{ "Ya" if asset.va == 1 else "Tidak" if asset.va == 0 else "-" }}</td>
+          <td>{{ asset.segment or "" }}</td><td>{{ asset.category or "" }}</td>
+          <td>{{ asset.environment or "" }}</td><td>{{ asset.os_version or "" }}</td>
+          <td>{{ asset.pic or "" }}</td><td>{{ asset.priority or "" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="13">Belum ada data untuk filter ini.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if total_pages > 1 %}
+  <nav aria-label="Pagination">
+    {% if page > 1 %}
+    <a href="{{ url_for('splunk_assets.asset_sync_page', page=page-1, per_page=per_page, q=search, environment=environment) }}">Sebelumnya</a>
+    {% endif %}
+    <span>Halaman {{ page }} dari {{ total_pages }}</span>
+    {% if page < total_pages %}
+    <a href="{{ url_for('splunk_assets.asset_sync_page', page=page+1, per_page=per_page, q=search, environment=environment) }}">Berikutnya</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}

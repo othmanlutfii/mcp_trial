@@ -9,6 +9,7 @@ __pycache__/
 
 # Vector DB hasil ingest (dibangun ulang dengan `python ingest.py`)
 vectordb/
+data/*.sqlite3
 
 # OS / editor
 .DS_Store

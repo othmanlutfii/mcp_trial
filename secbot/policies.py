@@ -57,19 +57,21 @@ def required_controls(
 # Port manajemen menurut NET.md; dipakai aturan segmen.
 MANAGEMENT_PORTS = {22, 3389, 445, 7001, 7002}
 WEB_PORTS = {80, 443, 8080, 8443}
+HTTP_PORTS = {80, 8080}
+HTTPS_PORTS = {443, 8443}
 
 # port -> (service, level, rule, note)
-# Level: PROHIBITED (default deny / tanpa exception), RESTRICTED (boleh dengan syarat).
-# PORT.md tidak memiliki port yang boleh dibuka tanpa syarat.
+# Level: PROHIBITED (default deny / tanpa exception), RESTRICTED (boleh dengan syarat),
+# ALLOW (port aman seperti HTTPS tetap dibatasi relasi source/destination di assessment).
 PORT_RULES = {
     20: ("FTP", "RESTRICTED", "P-3", "wajib exception form; ganti SFTP"),
     21: ("FTP", "RESTRICTED", "P-3", "wajib exception form; ganti SFTP"),
-    22: ("SSH/SFTP", "RESTRICTED", "P-4", "justifikasi server-to-server; DC COLO 20022/30022"),
+    22: ("SSH/SFTP", "RESTRICTED", "P-4", "justifikasi server-to-server"),
     23: ("Telnet", "PROHIBITED", "P-8", "default deny; tidak ada exception"),
     25: ("SMTP", "PROHIBITED", "P-10", "wajib redirect ke SMTPS 465"),
-    80: ("HTTP", "RESTRICTED", "P-2", "exception form; redirect HTTPS; PROD wajib SSL"),
+    80: ("HTTP", "RESTRICTED", "P-2", "same-env server-to-server or endpoint-to-server web; otherwise ENV.md/exception"),
     110: ("POP3", "PROHIBITED", "P-9", "wajib redirect ke POP3S 995"),
-    443: ("HTTPS", "RESTRICTED", "P-2", "HTTPS sebagai target redirect HTTP; PROD wajib SSL"),
+    443: ("HTTPS", "PROHIBITED", "P-13", "only endpoint-to-server or server-to-server; subject to ENV.md and network-segment rules"),
     445: ("SMB", "RESTRICTED", "P-6", "wajib SMB 3.0+; SMBv1 diblokir"),
     465: ("SMTPS", "RESTRICTED", "P-10", "pengganti aman SMTP"),
     995: ("POP3S", "RESTRICTED", "P-9", "pengganti aman POP3"),
@@ -87,19 +89,16 @@ PORT_RULES = {
     5903: ("VNC", "PROHIBITED", "P-11", "default deny; tidak ada exception"),
     7001: ("HTTP-alt management", "RESTRICTED", "SS-2/SS-5/SS-8", "hanya ke IP Management"),
     7002: ("HTTP-alt management", "RESTRICTED", "SS-2/SS-5/SS-8", "hanya ke IP Management"),
-    8080: ("HTTP-alt", "RESTRICTED", "P-2", "exception form; redirect HTTPS"),
-    8443: ("HTTPS-alt", "RESTRICTED", "P-2", "HTTPS-alt sebagai target redirect HTTP"),
-    20022: ("SSH DC COLO", "RESTRICTED", "P-4", "redirect dari port 22"),
-    30022: ("SFTP DC COLO", "RESTRICTED", "P-4", "redirect dari port 22"),
+    8080: ("HTTP-alt", "RESTRICTED", "P-2", "same-env server-to-server or endpoint-to-server web; otherwise ENV.md/exception"),
+    8443: ("HTTPS-alt", "PROHIBITED", "P-13", "only endpoint-to-server or server-to-server; subject to ENV.md and network-segment rules"),
     27017: ("MongoDB", "RESTRICTED", "P-7", "aturan port database P-7"),
-    103389: ("RDP DC COLO", "RESTRICTED", "P-5", "redirect dari port 3389"),
 }
 
 DB_PORTS = {1433, 1521, 1522, 1530, 1540, 3306, 5432, 27017}
 
 
 def classify_port(port: int) -> dict:
-    """Klasifikasikan port menurut ``PORT.md`` (P-1 default deny).
+    """Klasifikasikan port menurut ``PORT.md``; assessment menerapkan aturan kontekstual.
 
     Port yang tidak punya aturan eksplisit **tidak** dianggap "perlu review":
     P-1 menyatakan seluruh akses diblokir secara default.
@@ -159,6 +158,7 @@ def _rule(level: str, rule: str, points: int, note: str) -> dict:
 
 def _workstation_rule(
     dst_segment: str,
+    dst_category: str | None,
     dst_environment: str | None,
     port: int,
 ) -> dict:
@@ -170,6 +170,37 @@ def _workstation_rule(
             "WS-3",
             35,
             "LAN Campus tidak boleh langsung ke DMZ; gunakan F5/forwarding",
+        )
+    if (
+        segment_kind(dst_segment) == "server-farm"
+        and zone_kind(dst_category) == "management"
+    ):
+        if dst_env in PRODUCTION_SIDE:
+            return _rule(
+                "BLOCK",
+                "WS-2",
+                35,
+                "LAN Campus tidak boleh langsung ke IP Management Server Farm PROD/PRE-PROD",
+            )
+        if dst_env in NON_PRODUCTION:
+            if port in MANAGEMENT_PORTS:
+                return _rule(
+                    "ALLOW",
+                    "WS-2",
+                    0,
+                    "port management LAN Campus ke IP Management Server Farm non-produksi",
+                )
+            return _rule(
+                "BLOCK",
+                "WS-2",
+                35,
+                "hanya port management yang boleh ke IP Management Server Farm non-produksi",
+            )
+        return _rule(
+            "REVIEW",
+            "WS-2",
+            10,
+            "environment IP Management Server Farm tidak dinyatakan",
         )
     if dst_env in PRODUCTION_SIDE:
         if port in WEB_PORTS:
@@ -183,7 +214,7 @@ def _workstation_rule(
             "BLOCK",
             "W-4",
             35,
-            "LAN Campus ke PROD/PRE-PROD hanya untuk web-based access",
+            "akses langsung LAN Campus ke SSH/database PROD/PRE-PROD diblokir; gunakan PAM, hanya web access yang boleh langsung",
         )
     if dst_env in NON_PRODUCTION:
         return _rule("ALLOW", "W-1", 0, "LAN Campus ke non-produksi")
@@ -316,7 +347,9 @@ def segment_rule(
                 "LAN Campus ke LAN Campus hanya untuk transfer file (SMB/SFTP)",
             )
         if src_workstation:
-            return _workstation_rule(dst_segment or "", dst_environment, port)
+            return _workstation_rule(
+                dst_segment or "", dst_category, dst_environment, port
+            )
         src_env = normalize_environment(src_environment)
         if src_env in PRODUCTION_SIDE:
             return _rule(

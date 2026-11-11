@@ -1,5 +1,24 @@
 # SLA Remediasi Vulnerability
 
+## Temuan VA dengan VPR di Atas 8
+
+Setiap temuan vulnerability dari Tenable.sc dengan **VPR > 8** wajib
+ditindaklanjuti untuk remediasi. Untuk aset server, tim server pemilik aset
+bertanggung jawab memvalidasi temuan, menyusun rencana perbaikan, dan
+menjadwalkan pemasangan patch atau mitigasi. Temuan pada endpoint diteruskan
+kepada tim pemilik endpoint yang bertanggung jawab.
+
+Rekomendasi tindak lanjut:
+
+> Temuan VA dengan VPR > 8 wajib diremediasi oleh tim server pemilik aset.
+> Validasi temuan, tentukan patch atau mitigasi yang sesuai, dan lakukan
+> pemindaian VA ulang setelah perbaikan untuk memastikan temuan telah tertutup.
+
+VPR > 8 adalah pemicu wajib tindak lanjut, bukan pengganti severity. Tentukan
+severity dari data Tenable dan gunakan SLA pada tabel berikut sesuai severity
+serta environment aset. Jika remediasi tidak dapat diselesaikan dalam SLA,
+ikuti proses exception yang berlaku di bawah ini.
+
 ## Batas Waktu Perbaikan
 
 | Severity | Server PROD | Server Non-PROD |

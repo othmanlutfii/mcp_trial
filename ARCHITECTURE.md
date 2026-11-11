@@ -11,7 +11,8 @@ flowchart LR
     U["Pengguna"] -->|"pertanyaan / permintaan akses"| CLI["CLI Python<br/>main.py atau python -m secbot"]
     CLI --> APP["Security Bot<br/>LangGraph + LangChain"]
 
-    APP --> JSON[("data/*.json<br/>CMDB dan data VA dummy")]
+    APP --> JSON[("data/*.json<br/>CMDB dan data VA untuk skor")]
+    APP -->|"REST /rest/analysis"| TENABLE["Tenable.sc"]
     APP --> KB[("vectordb/<br/>Chroma persisten")]
     MD["knowledge/*.md"] --> INGEST["python ingest.py"]
     INGEST -->|"split + embedding + simpan"| KB
@@ -19,13 +20,11 @@ flowchart LR
     APP -->|"chat dan tool-calling"| CHAT["Provider LLM<br/>Ollama / Gemini / DeepSeek"]
     APP -->|"embedding saat pencarian"| EMBED["Provider embedding<br/>Ollama / Gemini"]
 
-    API["CMDB API :8001<br/>VA API :8002 (rencana)"] -.->|"belum terhubung; pengganti JSON"| JSON
+    API["CMDB API :8001 (rencana)"] -.->|"belum terhubung; pengganti JSON"| JSON
 ```
 
-Pengguna berinteraksi melalui terminal, baik secara interaktif maupun dengan satu
-pertanyaan sebagai argumen. Tidak ada web server atau API publik pada implementasi
-saat ini. Provider model dan lokasi data dikonfigurasi melalui environment variable
-atau `.env`.
+Pengguna berinteraksi melalui terminal atau UI web lokal. Provider model, lokasi
+data, dan credential Tenable dikonfigurasi melalui environment variable atau `.env`.
 
 ## 2. Komponen aplikasi
 
@@ -206,11 +205,12 @@ embedding berubah.
 | Area | Implementasi saat ini | Ketahanan / batas |
 |---|---|---|
 | Data aset | `data/assets.json`, dibaca melalui `secbot.datasource` | Data contoh lokal; bukan koneksi CMDB live. |
-| Data vulnerability | `data/vulns.json`, dibaca melalui `secbot.datasource` | Data hasil scan dummy; bukan koneksi VA live. |
+| Data vulnerability untuk skor | `data/vulns.json`, dibaca melalui `secbot.datasource` | Data dummy lokal; skor risiko yang ada tetap memakai sumber ini. |
+| Finding VA | `secbot.tenable` → Tenable.sc `/rest/analysis` | Diambil otomatis saat assessment, dipaginasi, dan ditransformasikan; error ditandai gagal. |
 | Dokumen kebijakan | File Markdown pada `knowledge/` | Source of truth untuk retrieval; sebagian aturan yang harus dihitung juga direpresentasikan di `secbot.policies`. |
 | Vector index | Chroma pada `vectordb/` | Persisten di disk lokal, dibuat oleh perintah ingest. |
 | Riwayat percakapan | LangGraph `MemorySaver` dan `thread_id` | Hanya in-memory selama proses berjalan; tidak dipersistenkan lintas restart. CLI memakai `sesi-1`. |
-| Konfigurasi | `.env` opsional dan environment variable | Provider chat: Ollama, Gemini, atau DeepSeek. Provider embedding: Ollama atau Gemini. |
+| Konfigurasi | `.env` opsional dan environment variable | Provider chat/embedding serta `TENABLE_BASE_URL`, `ACCESS_KEY`, `SECRET_KEY`, dan timeout Tenable. |
 
 DeepSeek hanya digunakan untuk chat; embedding tetap memakai Gemini atau Ollama.
 Secara default provider embedding mengikuti chat jika provider tersebut mendukung
@@ -223,12 +223,12 @@ sebagai fallback konfigurasi.
   `python -m secbot`, atau mode satu pertanyaan.
 - **Cara memperbarui knowledge:** proses CLI terpisah melalui `python ingest.py`.
 - **Dependensi runtime:** LangChain/LangGraph, Chroma, splitter Markdown, dotenv,
-  dan paket provider yang dipakai.
-- **Integrasi eksternal:** provider LLM/embedding terpilih; Ollama dapat berjalan
-  lokal, sedangkan Gemini/DeepSeek memerlukan API provider.
-- **Belum termasuk:** UI web, endpoint layanan, autentikasi/otorisasi pengguna,
-  database transaksional, audit store persisten, dan koneksi langsung CMDB/VA.
+  requests, dan paket provider yang dipakai.
+- **Integrasi eksternal:** Tenable.sc REST API dan provider LLM/embedding terpilih;
+  Ollama dapat berjalan lokal, sedangkan Gemini/DeepSeek memerlukan API provider.
+- **Belum termasuk:** endpoint layanan, autentikasi/otorisasi pengguna,
+  database transaksional, audit store persisten, dan koneksi langsung CMDB.
 
-Untuk mengganti data dummy dengan layanan asli, batas integrasi yang dituju adalah
-`secbot.datasource.load_assets()` dan `load_vulns()`. Perubahan pada integrasi itu
-perlu mempertahankan bentuk data yang dipakai tool dan pipeline assessment.
+Integrasi Tenable menyediakan Finding VA langsung, tetapi sumber vulnerability lokal
+`data/vulns.json` tetap dipakai oleh perhitungan skor risiko lama. Data aset CMDB
+masih lokal dan dapat diganti melalui batas `secbot.datasource.load_assets()`.

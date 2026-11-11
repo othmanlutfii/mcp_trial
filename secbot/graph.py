@@ -88,7 +88,7 @@ def make_access_review_node(verbose: bool = True):
         request = state.get("request") or {}
         if not router_mod.is_complete(request):
             return {
-                "messages": [AIMessage(content=router_mod.clarification_message(request))],
+                "messages": [AIMessage(conxxxxxxxxxxxtent=router_mod.clarification_message(request))],
                 "pending_request": request,
             }
 

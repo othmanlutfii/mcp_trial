@@ -124,7 +124,8 @@ label {
   font-weight: 600;
 }
 
-input {
+input,
+select {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--line);
@@ -134,7 +135,8 @@ input {
   font: inherit;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
   background: #fff;
@@ -195,6 +197,14 @@ button:hover { background: var(--accent-dark); }
 
 .score-value { font-size: 34px; font-weight: 800; line-height: 1; }
 .score-label { color: var(--muted); font-size: 12px; }
+
+.executive-summary { border-left: 4px solid var(--accent); }
+.executive-summary h2 { margin: 3px 0 10px; font-size: 21px; }
+.summary-overview { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
+.summary-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.summary-columns h3 { margin: 0 0 6px; font-size: 14px; }
+.summary-columns ul { margin: 0; padding-left: 20px; }
+.summary-columns li { margin-bottom: 6px; }
 
 /* ---------- Side-by-side asset cards ---------- */
 .side-grid {
@@ -381,6 +391,25 @@ button:disabled { opacity: 0.65; cursor: progress; }
 @media (max-width: 760px) {
   .field-grid,
   .side-grid,
+  .summary-columns,
   .controls-grid { grid-template-columns: minmax(0, 1fr); }
   .score { justify-items: start; }
+}
+/* Splunk asset inventory */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border, #d9e0e8);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.data-table th {
+  background: var(--surface-muted, #f3f6f9);
 }

@@ -3,7 +3,7 @@
 Semua perhitungan DETERMINISTIK (dilakukan kode), bukan tebakan LLM. Modul ini
 tidak memuat LangChain supaya bisa dipakai langsung oleh CLI maupun UI web.
 """
-from . import datasource, policies
+from . import datasource, policies, tenable
 
 
 def _vuln_summary(ip: str) -> dict:
@@ -85,6 +85,52 @@ def _is_public_facing(side: dict) -> bool:
     """Penanda public-facing untuk prioritas SLA (kategori public atau segmen DMZ)."""
     category = (side.get("ip_category") or "").lower()
     return "public" in category or (side.get("segment") or "").lower() == "dmz"
+
+
+def _connection_port_info(port: int, source: dict, destination: dict) -> dict:
+    """Klasifikasikan web port sesuai relasi endpoint/server pada PORT.md."""
+    port_info = policies.classify_port(port)
+    if port not in policies.HTTP_PORTS | policies.HTTPS_PORTS:
+        return port_info
+
+    both_registered = source["registered"] and destination["registered"]
+    source_is_server = source["asset_type"] != "endpoint"
+    destination_is_server = destination["asset_type"] != "endpoint"
+    if not both_registered:
+        return port_info
+
+    if port in policies.HTTPS_PORTS and (
+        (source_is_server and destination_is_server)
+        or (source["asset_type"] == "endpoint" and destination_is_server)
+    ):
+        return {
+            **port_info,
+            "level": "ALLOW",
+            "note": "HTTPS; tetap mengikuti aturan environment dan segmen",
+        }
+
+    if port not in policies.HTTP_PORTS:
+        return port_info
+
+    if source_is_server and destination_is_server:
+        source_environment = policies.normalize_environment(source.get("environment"))
+        destination_environment = policies.normalize_environment(
+            destination.get("environment")
+        )
+        if source_environment and source_environment == destination_environment:
+            note = "HTTP server-to-server dalam environment yang sama"
+        else:
+            note = "HTTP server-to-server; lintas environment mengikuti ENV.md"
+    elif source["asset_type"] == "endpoint" and destination_is_server:
+        note = "HTTP endpoint-to-server untuk web access; mengikuti ENV.md"
+    else:
+        return port_info
+
+    return {
+        **port_info,
+        "level": "ALLOW",
+        "note": f"{note}; tetap mengikuti aturan segmen",
+    }
 
 
 def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = "tcp") -> dict:
@@ -184,7 +230,7 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
             )
 
     # 2. Port sesuai PORT.md (P-1 default deny)
-    port_info = policies.classify_port(port)
+    port_info = _connection_port_info(port, src, dst)
     if port_info["level"] == "PROHIBITED":
         hard_block(
             40,
@@ -325,7 +371,7 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
     else:
         decision = "APPROVE"
 
-    return {
+    result = {
         "request": {
             "src_ip": src_ip,
             "dst_ip": dst_ip,
@@ -344,3 +390,10 @@ def assess_connection_data(src_ip: str, dst_ip: str, port: int, protocol: str = 
         "risk_level": risk,
         "preliminary_decision": decision,
     }
+    try:
+        result["finding_va"] = tenable.get_connection_findings(src_ip, dst_ip)
+        result["finding_va_status"] = "success"
+    except tenable.TenableIntegrationError as exc:
+        result["finding_va_status"] = "failed"
+        result["finding_va_error"] = str(exc)
+    return result

@@ -128,7 +128,9 @@ Dua halaman, tanpa build frontend:
 python app.py                 # buka http://127.0.0.1:5000
 ```
 
-- **Assessment Buka Perangkat** (`/`) — input IP source, IP destination, dan port.
+- **Assessment Buka Perangkat** (`/`) — input IP source, IP destination, port,
+  Service manual, dan protocol TCP/UDP. Service hanya keterangan; keputusan
+  kebijakan tetap ditentukan oleh port dan aturan jaringan.
   Skor risiko dihitung deterministik, lalu pipeline 3 agen AI yang sama dengan
   chatbot (`review_access`) menyusun keputusan dan rekomendasi. Karena memanggil
   LLM dan knowledge base, prosesnya bisa memakan puluhan detik; UI menampilkan
@@ -136,6 +138,73 @@ python app.py                 # buka http://127.0.0.1:5000
 - **Cek Compliance IP** (`/compliance`) — input satu IP untuk melihat status
   `COMPLIANT`/`NON-COMPLIANT` dan kontrol wajib sesuai environment + segmennya. Halaman ini
   deterministik dan tidak memanggil LLM.
+- **Asset Splunk** (`/splunk/assets`) — halaman baca data aset tersimpan di SQLite;
+  membuka halaman tidak menjalankan query ke Splunk. Halaman dilindungi HTTP Basic Auth.
+
+### Integrasi Splunk untuk Asset Universe
+
+Atur `.env` tanpa membagikan token:
+
+```ini
+SPLUNK_HOST=https://splunk.example.internal
+SPLUNK_PORT=8089
+SPLUNK_TOKEN=
+SPLUNK_VERIFY_TLS=true
+SPLUNK_CA_BUNDLE=
+SPLUNK_ASSETS_READ_TOKEN=
+SPLUNK_ASSETS_SYNC_TOKEN=
+SPLUNK_ASSETS_UI_USERNAME=
+SPLUNK_ASSETS_UI_PASSWORD=
+```
+
+HTTPS dan verifikasi sertifikat aktif secara default. Untuk sertifikat internal,
+isi `SPLUNK_CA_BUNDLE` dengan path CA PEM yang dipercaya; jangan mematikan verifikasi
+TLS sebagai perbaikan permanen.
+
+Skema SQLite ada di `migrations/001_splunk_assets.sql`. Terapkan/siapkan skema dengan:
+
+```bash
+python -m secbot.splunk_assets
+```
+
+API menggunakan Bearer token dengan hak terpisah:
+
+- `POST /api/splunk/assets/sync` — wajib `SPLUNK_ASSETS_SYNC_TOKEN`, langsung
+  mengembalikan ID run dan URL status.
+- `GET /api/splunk/assets/sync/<run_id>` — wajib `SPLUNK_ASSETS_READ_TOKEN`.
+- `GET /api/splunk/assets?page=1&per_page=50&q=&environment=` — wajib
+  `SPLUNK_ASSETS_READ_TOKEN`.
+
+Contoh pemanggilan:
+
+```bash
+curl -X POST http://127.0.0.1:5000/api/splunk/assets/sync \
+  -H "Authorization: Bearer <SPLUNK_ASSETS_SYNC_TOKEN>"
+curl "http://127.0.0.1:5000/api/splunk/assets?page=1&per_page=50" \
+  -H "Authorization: Bearer <SPLUNK_ASSETS_READ_TOKEN>"
+```
+
+Sinkronisasi menjalankan `| inputlookup bni_asset_universe` melalui Splunk REST
+search jobs, menunggu SID selesai, lalu mengambil seluruh halaman hasil. Run log
+menyimpan status, SID, jumlah baris, insert/update, waktu, dan error yang telah
+disanitasi. Baris di-upsert tanpa menghapus aset yang tidak muncul di hasil.
+ID sumber (`asset_id`, `assetId`, atau `id`) dipakai bila tersedia; jika tidak,
+kunci deduplikasi memakai gabungan IP, hostname, dan asset type. Raw result
+tersimpan pada `raw_json` tetapi tidak dikirim pada API/UI.
+
+Worker memakai daemon thread per proses karena aplikasi belum memiliki antrean
+background persisten. Database mencegah sync serentak yang identik, tetapi job
+yang sedang berjalan tidak bertahan jika proses aplikasi berhenti. Untuk deployment
+multi-worker/produksi, gunakan job queue persisten.
+
+Asumsi pemetaan: kolom lookup menggunakan nama setara IP, hostname, asset_type,
+EDR, PAM, SPLUNK, VA, Segment, category, environment, os_version, pic, dan priority
+(nama tidak peka kapitalisasi). Aplikasi belum mempunyai autentikasi/otorisasi
+umum; endpoint baru karena itu memakai token baca dan token sync khusus, sedangkan
+UI memakai HTTP Basic dengan credential terpisah. Siapkan token dan user/password
+tersebut di environment, bukan di repository. Untuk deployment remote, letakkan
+Flask di belakang reverse proxy HTTPS agar credential Basic tidak dikirim melalui
+koneksi plaintext.
 
 Host/port bisa diubah lewat `WEB_HOST` dan `WEB_PORT`, misalnya
 `WEB_PORT=8080 python app.py`. Halaman assessment membutuhkan konfigurasi provider
@@ -204,6 +273,7 @@ Bot > Permintaan ini terlihat seperti review pembukaan akses, tetapi datanya bel
     ├── __init__.py
     ├── __main__.py         # `python -m secbot` = aplikasi utama
     ├── config.py           # provider, model, API key, lokasi folder
+    ├── tenable.py          # integrasi REST API Tenable.sc untuk Finding VA
     ├── llm.py              # pabrik model chat & embedding per provider
     ├── datasource.py       # baca data aset & vulnerability
     ├── policies.py         # aturan deterministik (compliance, port, segmen, SLA)
@@ -242,11 +312,57 @@ Semua nilai bisa lewat environment variable atau file `.env`.
 | `TEMPERATURE` | Temperatur LLM (default `0`) |
 | `THINKING` | `false` (default) mematikan mode berpikir/penalaran -- jauh lebih cepat; `true` mengaktifkan |
 | `ASSETS_FILE`, `VULNS_FILE` | Path file data dummy |
+| `TENABLE_BASE_URL`, `ACCESS_KEY`, `SECRET_KEY` | Endpoint host dan API key Tenable.sc; credential hanya dari environment atau `.env` |
+| `TENABLE_CA_BUNDLE`, `TENABLE_VERIFY_TLS` | CA bundle tepercaya atau toggle validasi TLS (default `true`; mematikan berisiko) |
+| `TENABLE_CONNECT_TIMEOUT`, `TENABLE_READ_TIMEOUT` | Timeout koneksi dan pembacaan Tenable dalam detik |
 
 Override yang tersedia: `SECBOT_PROVIDER`, `SECBOT_OLLAMA_URL`, `SECBOT_LLM_MODEL`,
 `SECBOT_EMBED_MODEL`, `SECBOT_GEMINI_API_KEY`, `SECBOT_GEMINI_MODEL`,
 `SECBOT_GEMINI_EMBED_MODEL`, `SECBOT_DEEPSEEK_API_KEY`, `SECBOT_DEEPSEEK_MODEL`,
 `SECBOT_DEEPSEEK_BASE_URL`, `SECBOT_EMBED_PROVIDER`, `SECBOT_TEMPERATURE`, `SECBOT_THINKING`.
+
+### Finding VA Tenable.sc
+
+Isi `TENABLE_BASE_URL`, `ACCESS_KEY`, dan `SECRET_KEY` di environment atau `.env`
+(jangan commit credential). Saat assessment koneksi diproses, `secbot.tenable`
+mengirim request langsung ke `{TENABLE_BASE_URL}/rest/analysis` dengan header resmi
+`X-ApiKeys`; query tetap deterministik, memakai filter IP source/destination,
+VPR `8.1-10`, dan pagination 500 record. Data ditransformasikan menjadi JSON
+`ip_summary`, `overall_summary`, dan `vulnerabilities`, lalu ditampilkan di bagian
+Finding VA pada output verbose CLI. Hasil dan status Tenable tidak ditampilkan pada
+halaman web maupun diberikan ke Reviewer Agent. Jika Tenable gagal, assessment
+menandai Finding VA sebagai gagal dan tidak menyimpan kegagalan seolah-olah tidak
+ada temuan.
+
+Halaman assessment menyajikan Executive Summary deterministik untuk pengambil
+keputusan: hasil, tingkat risiko umum, temuan penting, dan concern/tindak lanjut
+yang diturunkan dari data assessment (bukan dikarang model).
+
+Severity Informational (0) tetap dihitung sebagai temuan dan ditampilkan dalam
+detail, tetapi tidak menambah kategori Critical/High/Medium/Low. Record identik
+dideduplikasi per IP; temuan plugin yang sama pada IP source dan destination tetap
+tercatat terpisah. Hasil assessment saat ini dikirim langsung ke halaman peminta;
+aplikasi belum memiliki penyimpanan assessment persisten.
+
+Jika sertifikat TLS Tenable diterbitkan CA internal, isi `TENABLE_CA_BUNDLE` dengan
+path file PEM CA tepercaya (contoh Windows: `C:/certs/tenable-ca-bundle.pem`).
+Minta bundle CA resmi dari administrator/PKI. Verifikasi sertifikat aktif secara
+default (`TENABLE_VERIFY_TLS=true`). Untuk jaringan internal tepercaya saja, opsi
+`TENABLE_VERIFY_TLS=false` melewati verifikasi sertifikat seperti Postman dengan
+SSL verification dimatikan. Mode ini rentan terhadap penyadapan/MITM dan dapat
+mengekspos API key; gunakan hanya sementara, jangan di production, dan lebih baik
+gunakan CA bundle resmi.
+
+Uji integrasi tanpa akses jaringan Tenable:
+
+```bash
+python -m unittest discover -s tests
+```
+
+Sebelum menjalankan ulang `python ingest.py`, hentikan proses aplikasi/chatbot yang
+sedang membaca Chroma di `vectordb/` (termasuk proses Python lain). Jika file index
+masih terkunci di Windows, ingest akan berhenti dengan petunjuk yang jelas; tutup
+proses pemakai lalu ulangi perintah.
 
 ### `secbot/llm.py` - pabrik model
 

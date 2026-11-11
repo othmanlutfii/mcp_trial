@@ -35,20 +35,39 @@ ATURAN KERAS:
   DENY, REVIEW_REQUIRED, APPROVE_WITH_CONDITIONS, APPROVE.
 - Jika DATA ASSESSMENT memuat conditions atau review_reasons, sebutkan sebagai syarat
   yang wajib dipenuhi; jangan menyatakan APPROVE tanpa memenuhinya.
+- Laporkan hanya nilai yang benar-benar ada pada DATA ASSESSMENT. Untuk status EDR/PAM/VA,
+  bedakan status kontrol boolean dari hasil temuan vulnerability; jangan menyatakan
+  "tidak ada data" jika status boolean tersedia.
+- Sebutkan SLA hanya jika field sla pada sisi terkait berisi nilai. Jangan menyimpulkan
+  atau mengarang jumlah hari dari rule, port, atau kegagalan integrasi. Jika SLA null,
+  tulis "Tidak ada SLA remediasi yang dihitung untuk sisi ini."
+- Finding VA Tenable bukan bagian dari penilaian naratif ini.
 - Jika asset_type adalah endpoint (segmen LAN), sebut sebagai PC/endpoint, jangan
     kategorikan sebagai server, dan jangan menilai environment endpoint sebagai environment
     server. Gunakan aturan workstation/LAN untuk arah aksesnya; aturan server S-1..S-4
     hanya berlaku jika kedua sisi adalah server.
+- Untuk PC/LAN ke PROD/PRE-PROD, jangan rekomendasikan koneksi langsung SSH/database.
+  Akses administratif harus melalui alur PC/LAN -> layanan PAM -> server produksi;
+  koneksi PAM ke target adalah network flow terpisah yang harus dinilai tersendiri.
+- Akses langsung PC/LAN ke DEV/UAT/SIT melalui SSH/database mengikuti W-1, P-4, dan P-7.
+- Akses server lintas environment tidak otomatis diizinkan; hanya pasangan dan syarat
+  yang tercantum di ENV.md S-1..S-4 yang berlaku.
 - Rekomendasi harus konkret dan merujuk pada temuan (IP/hostname/CVE/port).
 
 FORMAT JAWABAN:
-1. Keputusan: <keputusan> | Risiko: <level> (skor)
-2. Ringkasan singkat (2-3 kalimat)
-3. Compliance (EDR/PAM/VA) source dan destination sesuai required_controls
-4. Severity vulnerability source dan destination + SLA remediasi
-5. Penilaian port, segmen, dan environment (sebutkan rule ID yang relevan)
-6. Rekomendasi (daftar bernomor: perbaikan, modifikasi permintaan, alternatif yang lebih aman)
-7. Referensi kebijakan (nama file knowledge + policy_refs)"""
+Gunakan teks biasa tanpa Markdown: jangan gunakan **, *, backtick, tabel, atau bullet.
+Gunakan heading dan label sederhana, dengan satu baris kosong antarbagian:
+Keputusan: <keputusan> | Risiko: <level> (skor <angka>)
+Ringkasan: <2-3 kalimat>
+Compliance
+Source (<IP>): EDR <status>, PAM <status>, VA <status>
+Destination (<IP>): EDR <status>, PAM <status>, VA <status>
+Vulnerability dan SLA
+Source (<IP>): severity <data>; SLA <data atau tidak dihitung>
+Destination (<IP>): severity <data>; SLA <data atau tidak dihitung>
+Aturan akses: port, segmen, dan environment yang benar-benar relevan; sertakan rule ID hanya bila tersedia.
+Rekomendasi: maksimal 3 tindakan bernomor berdasarkan temuan.
+Referensi: nama file knowledge dan policy_refs yang relevan."""
 
 
 def _llm():
@@ -113,6 +132,18 @@ def review_access(
     if "error" in data:
         return f"Permintaan tidak dapat dinilai: {data['error']}"
 
+    finding_va_status = data.get("finding_va_status")
+    if finding_va_status is not None and verbose:
+        finding_va_log = {"status": finding_va_status}
+        if finding_va_status == "success":
+            finding_va_log["data"] = data.get("finding_va")
+        else:
+            finding_va_log["error"] = data.get("finding_va_error", "Unknown error")
+        log(
+            "[Finding VA Tenable]\n"
+            + json.dumps(finding_va_log, ensure_ascii=False, indent=2)
+        )
+
     # Tahap 2: aturan dari knowledge (query diperkaya konteks hasil assessment)
     log("[2/3] Policy Agent: mengambil aturan dari knowledge...")
     s, d = data["source"], data["destination"]
@@ -157,6 +188,11 @@ def review_access(
 
     # Tahap 3: penilaian dan rekomendasi
     log("[3/3] Reviewer Agent: menyusun penilaian dan rekomendasi...\n")
-    user_msg = (f"DATA ASSESSMENT:\n{json.dumps(data, ensure_ascii=False, indent=1)}\n\n"
+    reviewer_data = {
+        key: value
+        for key, value in data.items()
+        if key not in {"finding_va", "finding_va_status", "finding_va_error"}
+    }
+    user_msg = (f"DATA ASSESSMENT:\n{json.dumps(reviewer_data, ensure_ascii=False, indent=1)}\n\n"
                 f"ATURAN DARI KNOWLEDGE:\n{policy_text}")
     return message_text(llm.invoke([("system", REVIEWER_PROMPT), ("user", user_msg)]))

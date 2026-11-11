@@ -20,6 +20,10 @@ from . import config, knowledge
 from .llm import ProviderError, active_embed_model_name, describe
 
 
+class VectorStoreInUseError(RuntimeError):
+    """Raised when an active process prevents rebuilding the vector database."""
+
+
 def load_documents() -> list[Document]:
     """Baca seluruh file ``.md`` di ``knowledge/`` dan pecah per heading.
 
@@ -42,7 +46,14 @@ def build_index() -> int:
     """Buat ulang vector DB dari nol. Kembalikan jumlah chunk yang di-ingest."""
     docs = load_documents()
     if os.path.exists(config.VECTOR_DIR):
-        shutil.rmtree(config.VECTOR_DIR)  # rebuild bersih
+        try:
+            shutil.rmtree(config.VECTOR_DIR)  # rebuild bersih
+        except PermissionError as exc:
+            raise VectorStoreInUseError(
+                "Tidak dapat menghapus vector DB karena ada proses yang sedang "
+                "memakainya. Tutup aplikasi/chatbot atau proses Python lain yang "
+                "mengakses knowledge base, lalu jalankan ulang `python ingest.py`."
+            ) from exc
     Chroma.from_documents(
         docs,
         knowledge.get_embeddings(),
@@ -59,6 +70,8 @@ def main() -> None:
         total = build_index()
     except ProviderError as e:
         raise SystemExit(f"\nKonfigurasi model belum lengkap:\n{e}")
+    except VectorStoreInUseError as e:
+        raise SystemExit(f"\nGagal membangun ulang knowledge base:\n{e}")
     print(
         f"Selesai: {total} chunk dari folder '{config.KNOWLEDGE_DIR.name}' "
         f"masuk ke vector DB '{config.VECTOR_DIR.name}'.\n"

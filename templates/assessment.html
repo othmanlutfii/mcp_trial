@@ -23,6 +23,17 @@
       Port
       <input type="number" name="port" value="{{ form.port }}" placeholder="443" min="1" max="65535" required>
     </label>
+    <label>
+      Service
+      <input type="text" name="service" value="{{ form.service }}" placeholder="Contoh: SSH/SFTP" maxlength="100" required>
+    </label>
+    <label>
+      Protocol (TCP/UDP)
+      <select name="protocol" required>
+        <option value="tcp" {% if form.protocol == "tcp" %}selected{% endif %}>TCP</option>
+        <option value="udp" {% if form.protocol == "udp" %}selected{% endif %}>UDP</option>
+      </select>
+    </label>
   </div>
   <button type="submit">Nilai Akses + Analisis AI</button>
 </form>
@@ -54,8 +65,9 @@
         {{ result.preliminary_decision|replace('_', ' ') }}
       </h2>
       <p class="muted mono">{{ result.request.src_ip }} → {{ result.request.dst_ip }} · port {{ result.request.port }}/{{ result.request.protocol }}</p>
+      <span class="chip">Service input: {{ form.service }}</span>
       <span class="chip chip-level-{{ result.port_info.level|lower }}">
-        {{ result.port_info.service }} · {{ result.port_info.level }}
+        Klasifikasi port: {{ result.port_info.service }} · {{ result.port_info.level }}
       </span>
     </div>
     <div class="score">
@@ -83,6 +95,32 @@
     <strong>Analisis AI gagal</strong>
     <p>{{ ai_error }}</p>
     <p>Hasil deterministik di bawah tetap dapat digunakan.</p>
+  </div>
+  {% endif %}
+
+  {% if result.executive_summary %}
+  <div class="card executive-summary">
+    <p class="eyebrow">Ringkasan untuk Pengambil Keputusan</p>
+    <h2>Executive Summary</h2>
+    <p class="summary-overview">{{ result.executive_summary.overview }}</p>
+    <div class="summary-columns">
+      <section>
+        <h3>Hasil pemeriksaan</h3>
+        <ul>
+          {% for point in result.executive_summary.key_points %}
+          <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+      <section>
+        <h3>Concern dan tindak lanjut</h3>
+        <ul>
+          {% for concern in result.executive_summary.concerns %}
+          <li>{{ concern }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
   </div>
   {% endif %}
 

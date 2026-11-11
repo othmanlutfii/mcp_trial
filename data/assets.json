@@ -273,9 +273,9 @@
     "environment": "DEV",
     "segment": "LAN",
     "dc": "DC-BDG",
-    "edr": false,
+    "edr": true,
     "pam": false,
-    "va": true,
+    "va": false,
     "operating_system": "Windows Server 2016",
     "ip_category": "data"
   },

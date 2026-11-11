@@ -186,6 +186,12 @@ lebih dulu, lalu Stage 2 dan Stage 3 dijalankan dengan komponen yang sama sepert
 **Assessment Agent** di depan; tool-nya memanggil fungsi deterministik yang sama, sehingga
 `data` assessment normalnya identik.
 
+Setelah perhitungan assessment, fungsi yang sama mengambil Finding VA langsung dari
+Tenable.sc untuk IP source dan destination. Hasil JSON ditambahkan sebagai `finding_va`;
+jika request gagal, `finding_va_status` bernilai `failed` dan `finding_va_error` berisi
+pesan aman (hasil tidak dianggap sebagai temuan kosong). Data `data/vulns.json` tetap
+dipakai terpisah untuk skor risiko yang ada.
+
 ---
 
 ## 3. Step 0 — Entry point dan grafik
@@ -654,6 +660,17 @@ else: APPROVE
 ```
 
 Hasil: **`APPROVE_WITH_CONDITIONS`**.
+
+#### (d) Finding VA live — Tenable.sc
+
+Di akhir assessment, `secbot.tenable.get_connection_findings()` mengirim query tetap
+ke `/rest/analysis` memakai API Key `X-ApiKeys`. Kedua IP digabung dalam filter `ip`,
+VPR difilter Tenable pada `8.1-10`, dan `startOffset`/`endOffset` mengambil seluruh
+halaman. Hanya field vulnerability yang relevan diproyeksikan. Hasil sukses disimpan
+pada `finding_va` dengan summary per IP dan keseluruhan; severity Informational masuk
+`total_findings`, tetapi tidak ke empat bucket severity. Hasil ini ditampilkan sebagai
+JSON pada bagian Finding VA halaman assessment. Repository belum memiliki penyimpanan
+assessment persisten.
 
 ### 6.4 Output lengkap `assess_connection_data`
 
@@ -1170,10 +1187,16 @@ hasil deterministik tetap tampil.
 
 ### 10.6 Web UI
 
+Form assessment menerima IP source, IP destination, port, service manual, dan
+protocol TCP/UDP. Service hanya keterangan yang ditampilkan kembali; penilaian
+tetap memakai klasifikasi dan aturan port dari `policies.py`. Contohnya port 22
+diklasifikasikan sebagai SSH/SFTP, tetapi service yang diisi pengguna tidak
+mengubah kebijakan port tersebut.
+
 | Fungsi | File | Input | Output |
 |---|---|---|---|
 | `assessment()` | `app.py` | form POST | HTML |
-| `_run_ai_review(...)` | `app.py` | IP, port, assessment | `(str, float)` |
+| `_run_ai_review(...)` | `app.py` | IP, port, protocol, assessment | `(str, float)` |
 | `compliance()` | `app.py` | form POST | HTML deterministik |
 
 ---
