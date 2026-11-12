@@ -1,37 +1,71 @@
 # SLA Remediasi Vulnerability
 
-## Temuan VA dengan VPR di Atas 8
+## Level Temuan VA
 
-Setiap temuan vulnerability dari Tenable.sc dengan **VPR > 8** wajib
-ditindaklanjuti untuk remediasi. Untuk aset server, tim server pemilik aset
-bertanggung jawab memvalidasi temuan, menyusun rencana perbaikan, dan
-menjadwalkan pemasangan patch atau mitigasi. Temuan pada endpoint diteruskan
-kepada tim pemilik endpoint yang bertanggung jawab.
+Setiap temuan vulnerability dari Tenable.sc dengan **VPR >= 8**
+dikategorikan **Critical**, dan temuan di luar kriteria tersebut
+dikategorikan **Non-Critical**.
 
-Rekomendasi tindak lanjut:
+VPR digunakan untuk menentukan level temuan, bukan untuk menentukan temuan mana yang perlu ditindaklanjuti.
+Seluruh temuan, baik Critical maupun Non-Critical, wajib diremediasi sesuai SLA pada ketentuan bagian Batas Waktu Perbaikan.
 
-> Temuan VA dengan VPR > 8 wajib diremediasi oleh tim server pemilik aset.
-> Validasi temuan, tentukan patch atau mitigasi yang sesuai, dan lakukan
-> pemindaian VA ulang setelah perbaikan untuk memastikan temuan telah tertutup.
-
-VPR > 8 adalah pemicu wajib tindak lanjut, bukan pengganti severity. Tentukan
-severity dari data Tenable dan gunakan SLA pada tabel berikut sesuai severity
-serta environment aset. Jika remediasi tidak dapat diselesaikan dalam SLA,
-ikuti proses exception yang berlaku di bawah ini.
+Apabila IP pada form tidak ditemukan di Tenable.sc atau belum pernah
+di-scan, sampaikan bahwa status VA tidak dapat dinilai, server harus di-scan VA terlebih dahulu.
 
 ## Batas Waktu Perbaikan
 
-| Severity | Server PROD | Server Non-PROD |
+| Level Temuan | Kriteria | SLA |
 |---|---|---|
-| Critical | 7 hari | 14 hari |
-| High | 14 hari | 30 hari |
-| Medium | 30 hari | 60 hari |
-| Low | 90 hari | 90 hari |
+| Critical | VPR >= 8 | 90 hari |
+| Non-Critical | Selain kriteria Critical | 180 hari |
 
-## Prioritas Perbaikan
+Untuk aplikasi yang akan go-live, seluruh temuan Critical maupun
+Non-Critical wajib diselesaikan sebelum release ke production.
 
-Urutan prioritas: (1) Critical pada server PROD public-facing, (2) Critical pada PROD internal,
-(3) High pada PROD, (4) sisanya sesuai SLA.
+## Rekomendasi Tindak Lanjut
+
+Sampaikan rekomendasi berikut kepada requestor apabila terdapat temuan VA:
+
+> Temuan VA wajib diremediasi oleh tim pengelola server dan aset owner sesuai SLA level temuannya.
+> Validasi temuan, tentukan patch atau perbaikan konfigurasi yang sesuai, dan dokumentasikan komitmen perbaikan dalam Berita Acara Komitmen Perbaikan.
+
+## Jika Temuan Belum Diremediasi
+
+- **Critical**: tidak dapat diajukan accept risk. Temuan Critical yang melewati SLA 90 hari dieskalasikan kepada system owner, General Manager CISO, dan SORX4.
+- **Non-Critical**: apabila belum dapat diremediasi, dapat diajukan accept risk dengan Berita Acara Komitmen Perbaikan yang disetujui pejabat setingkat Pemimpin Divisi pemilik aplikasi. Temuan tetap wajib diremediasi sesuai komitmen.
+
+## Ketentuan Remediasi
+
+1. Patch atau update yang digunakan harus berasal dari sumber resmi.
+2. Lakukan pengujian sebelum diimplementasikan.
+3. Setelah remediasi, ajukan re-scan ke CISO untuk memastikan temuan
+   tertutup.
+
+
+<!-- # SLA Remediasi Vulnerability
+
+## Temuan VA dengan VPR di Atas 8
+
+Setiap temuan vulnerability dari Tenable.sc dengan **VPR >= 8** dikategorikan **Critical** dan temuan di luar kriteria tersebut dikategorikan **Non-Critical**. 
+Seluruh temuan wajib ditindaklanjuti untuk diremediasi.
+Untuk server, tim server pemilik aset bertanggung jawab memvalidasi temuan, menyusun rencana perbaikan, dan menjadwalkan pemasangan patch atau mitigasi.
+Temuan pada endpoint diteruskan kepada tim pemilik endpoint yang bertanggung jawab.
+
+Rekomendasi tindak lanjut:
+
+> Temuan VA dengan VPR >= 8 wajib diremediasi oleh tim server pemilik aset.
+> Validasi temuan, tentukan patch atau mitigasi yang sesuai, dan lakukan
+> pemindaian VA ulang setelah perbaikan untuk memastikan temuan telah tertutup.
+
+VPR digunakan untuk menentukan level temuan, bukan untuk menentukan temuan mana yang perlu ditindaklanjuti. Seluruh temuan, baik Critical maupun Non-Critical, wajib diremediasi sesuai SLA pada tabel berikut.
+Jika remediasi tidak dapat diselesaikan dalam SLA, ikuti ketentuan pada bagian Jika Patch Tidak Bisa Segera Dipasang.
+
+## Batas Waktu Perbaikan
+
+| Severity | Kriteria | SLA |
+|---|---|---|
+| Critical | VPR >= 8 | 90 hari |
+| Non-Critical | Selain kriteria Critical | 180 hari |
 
 ## Jika Patch Tidak Bisa Segera Dipasang
 
@@ -46,3 +80,9 @@ Exception maksimal 30 hari dan wajib disetujui Head of Security.
 3. Jadwalkan change window untuk PROD.
 4. Lakukan patch, restart service, lalu verifikasi.
 5. Jalankan scan VA ulang untuk memastikan temuan tertutup.
+
+## Ketentuan Remediasi
+
+1. Patch atau update yang digunakan harus berasal dari sumber resmi.
+2. Lakukan pengujian sebelum diimplementasikan.
+3. Setelah remediasi, ajukan re-scan ke CISO untuk memastikan temuan tertutup. -->
