@@ -31,15 +31,14 @@ Sampaikan rekomendasi berikut kepada requestor apabila terdapat temuan VA:
 
 ## Jika Temuan Belum Diremediasi
 
-- **Critical**: tidak dapat diajukan accept risk. Temuan Critical yang melewati SLA 90 hari dieskalasikan kepada system owner, General Manager CISO, dan SORX4.
-- **Non-Critical**: apabila belum dapat diremediasi, dapat diajukan accept risk dengan Berita Acara Komitmen Perbaikan yang disetujui pejabat setingkat Pemimpin Divisi pemilik aplikasi. Temuan tetap wajib diremediasi sesuai komitmen.
+- **Critical**: tidak dapat diajukan accept risk. Temuan Critical yang melewati SLA 90 hari dieskalasikan kepada system owner.
+- **Non-Critical**: apabila belum dapat diremediasi, dapat diajukan accept risk dengan Berita Acara Komitmen Perbaikan yang disetujui. Temuan tetap wajib diremediasi sesuai komitmen.
 
 ## Ketentuan Remediasi
 
 1. Patch atau update yang digunakan harus berasal dari sumber resmi.
 2. Lakukan pengujian sebelum diimplementasikan.
-3. Setelah remediasi, ajukan re-scan ke CISO untuk memastikan temuan
-   tertutup.
+3. Setelah remediasi, ajukan re-scan untuk memastikan temuan tertutup.
 
 
 <!-- # SLA Remediasi Vulnerability
