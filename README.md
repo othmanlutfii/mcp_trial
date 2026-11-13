@@ -141,6 +141,34 @@ python app.py                 # buka http://127.0.0.1:5000
 - **Asset Splunk** (`/splunk/assets`) — halaman baca data aset tersimpan di SQLite;
   membuka halaman tidak menjalankan query ke Splunk. Halaman dilindungi HTTP Basic Auth.
 
+### Integrasi Tenable.sc
+
+Assessment koneksi mengirim query `vulndetails` terpisah untuk IP source dan
+destination, dengan VPR `8.1-10` dan maksimum tiga hasil per IP. Setiap temuan
+di-upsert ke SQLite pada `data/tenable_vulnerabilities.sqlite3` (bisa diubah lewat
+`TENABLE_DB_PATH`). Setelah penyimpanan, field analisis dibaca kembali dari database.
+Analisis tiap temuan selalu memakai Ollama (`SECBOT_OLLAMA_URL` dan
+`SECBOT_LLM_MODEL`), terlepas dari provider chatbot; hasilnya disimpan sebagai
+cache berdasarkan pasangan IP dan plugin ID. Bila analisis Ollama gagal, aplikasi
+menampilkan error setelah satu request awal dan maksimal dua retry, tanpa jawaban
+pengganti.
+
+Atur koneksi Tenable.sc dan (bila perlu) Ollama di `.env`, tanpa memasukkan credential
+ke repository:
+
+```ini
+TENABLE_BASE_URL=https://tenable.example.internal
+ACCESS_KEY=
+SECRET_KEY=
+TENABLE_VERIFY_TLS=true
+TENABLE_CA_BUNDLE=
+TENABLE_DB_PATH=data/tenable_vulnerabilities.sqlite3
+SECBOT_OLLAMA_URL=http://localhost:11434
+SECBOT_LLM_MODEL=qwen3:latest
+SECBOT_OLLAMA_CONNECT_TIMEOUT=5
+SECBOT_OLLAMA_READ_TIMEOUT=120
+```
+
 ### Integrasi Splunk untuk Asset Universe
 
 Atur `.env` tanpa membagikan token:

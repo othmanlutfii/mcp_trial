@@ -48,6 +48,8 @@ SUPPORTED_PROVIDERS = ("ollama", "gemini", "deepseek")
 OLLAMA_URL = _env("SECBOT_OLLAMA_URL", "http://localhost:11434")
 OLLAMA_LLM_MODEL = _env("SECBOT_LLM_MODEL", "qwen3:latest")
 OLLAMA_EMBED_MODEL = _env("SECBOT_EMBED_MODEL", "bge-m3:latest")
+OLLAMA_CONNECT_TIMEOUT = float(_env("SECBOT_OLLAMA_CONNECT_TIMEOUT", "5"))
+OLLAMA_READ_TIMEOUT = float(_env("SECBOT_OLLAMA_READ_TIMEOUT", "120"))
 
 # ---------- Google Gemini (free tier tersedia; model paling ringan & murah) ----------
 # gemini-3.5-flash-lite = model multimodal tercepat dan termurah di keluarga 3.x.
@@ -92,6 +94,9 @@ TENABLE_CA_BUNDLE = _env("TENABLE_CA_BUNDLE")
 TENABLE_VERIFY_TLS = _env_bool("TENABLE_VERIFY_TLS", True)
 TENABLE_CONNECT_TIMEOUT = float(_env("TENABLE_CONNECT_TIMEOUT", "5"))
 TENABLE_READ_TIMEOUT = float(_env("TENABLE_READ_TIMEOUT", "30"))
+TENABLE_DB_PATH = Path(
+    _env("TENABLE_DB_PATH", str(DATA_DIR / "tenable_vulnerabilities.sqlite3"))
+)
 
 # ---------- Splunk asset lookup synchronization ----------
 SPLUNK_HOST = _env("SPLUNK_HOST")

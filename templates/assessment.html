@@ -98,6 +98,39 @@
   </div>
   {% endif %}
 
+  {% if result.finding_va_status == "failed" %}
+  <div class="alert alert-error" role="alert">
+    <strong>Integrasi Tenable gagal</strong>
+    <p>{{ result.finding_va_error }}</p>
+  </div>
+  {% elif result.finding_va_status == "success" %}
+  <div class="card">
+    <p class="eyebrow">Analisis Kerentanan Tenable</p>
+    <h2>Analisis Ollama per IP</h2>
+    {% for report in result.finding_va.ip_reports %}
+    <section>
+      <h3 class="mono">{{ report.ip }}</h3>
+      {% if report.message %}
+      <p>{{ report.message }}</p>
+      {% endif %}
+      {% for vulnerability in report.vulnerabilities %}
+      <article class="vuln">
+        <h4>{{ vulnerability.plugin_name }} · VPR {{ vulnerability.vpr_score }}</h4>
+        {% if vulnerability.ollama_analysis %}
+        <pre class="ai-answer">{{ vulnerability.ollama_analysis }}</pre>
+        {% elif vulnerability.ollama_error %}
+        <div class="alert alert-error" role="alert">
+          <strong>Analisis Ollama gagal</strong>
+          <p>{{ vulnerability.ollama_error }}</p>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   {% if result.executive_summary %}
   <div class="card executive-summary">
     <p class="eyebrow">Ringkasan untuk Pengambil Keputusan</p>

@@ -212,6 +212,8 @@ def _executive_summary(result: dict) -> dict:
                 )
                 or any(
                     item.get("ip") == ip
+                    and isinstance(item.get("ollama_analysis"), str)
+                    and item["ollama_analysis"].strip()
                     and (
                         (
                             isinstance(item.get("vpr_score"), (int, float))

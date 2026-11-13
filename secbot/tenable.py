@@ -1,8 +1,13 @@
 """Integrasi REST API Tenable.sc untuk Finding VA pada assessment koneksi."""
 import ipaddress
+import json
 import logging
 import math
+import sqlite3
+import threading
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import requests
@@ -11,8 +16,7 @@ from . import config
 
 logger = logging.getLogger(__name__)
 
-PAGE_SIZE = 500
-MIN_VPR_SCORE = 8.0
+MAX_RESULTS = 3
 SEVERITY_BY_ID = {
     4: ("Critical", "critical"),
     3: ("High", "high"),
@@ -30,6 +34,14 @@ SEVERITY_KEYS = ("critical", "high", "medium", "low")
 
 class TenableIntegrationError(Exception):
     """Error integrasi yang aman ditampilkan tanpa membocorkan credential."""
+
+
+class OllamaAnalysisError(Exception):
+    """Analisis Ollama gagal setelah seluruh percobaan ulang."""
+
+
+_database_lock = threading.Lock()
+_database_initialized = False
 
 
 def _normalize_ip(value: str) -> str:
@@ -56,22 +68,22 @@ def _analysis_url() -> str:
     return f"{base_url}/rest/analysis"
 
 
-def _build_payload(ips: list[str], start_offset: int) -> dict:
+def _build_payload(ip: str) -> dict:
     return {
         "type": "vuln",
         "sourceType": "cumulative",
         "query": {
             "tool": "vulndetails",
             "type": "vuln",
-            "startOffset": start_offset,
-            "endOffset": start_offset + PAGE_SIZE,
+            "startOffset": 0,
+            "endOffset": MAX_RESULTS,
             "sortField": "vprScore",
             "sortDir": "DESC",
             "filters": [
                 {
                     "filterName": "ip",
                     "operator": "=",
-                    "value": ",".join(ips),
+                    "value": ip,
                 },
                 {
                     "filterName": "vprScore",
@@ -309,21 +321,61 @@ def _cve_text(value: object) -> str | None:
     raise TenableIntegrationError("Field cve pada respons Tenable tidak valid.")
 
 
+def _json_text(value: object, field: str) -> str | None:
+    if value is None:
+        return None
+    try:
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    except (TypeError, ValueError) as exc:
+        raise TenableIntegrationError(
+            f"Field {field} pada respons Tenable tidak valid."
+        ) from exc
+
+
+def _record_ip(item: dict, queried_ip: str) -> str:
+    value = item.get("ip")
+    if isinstance(value, str) and value.strip():
+        ip = _normalize_ip(value)
+    else:
+        ips_value = item.get("ips")
+        candidates = ips_value if isinstance(ips_value, list) else (
+            ips_value.split(",") if isinstance(ips_value, str) else []
+        )
+        normalized = []
+        for candidate in candidates:
+            if isinstance(candidate, str) and candidate.strip():
+                try:
+                    normalized.append(_normalize_ip(candidate))
+                except TenableIntegrationError:
+                    continue
+        ip = (
+            queried_ip
+            if queried_ip in normalized
+            else (normalized[0] if normalized else queried_ip)
+        )
+    if ip != queried_ip:
+        raise TenableIntegrationError(
+            "Tenable mengembalikan vulnerability di luar IP yang diminta."
+        )
+    return ip
+
+
 def _transform_results(ips: list[str], results: list[dict]) -> dict:
-    requested_ips = set(ips)
     records: list[tuple[dict, str | None]] = []
-    seen: set[tuple[object, ...]] = set()
+    seen: set[tuple[str, str]] = set()
+    if len(results) > MAX_RESULTS:
+        raise TenableIntegrationError(
+            f"Tenable mengembalikan lebih dari {MAX_RESULTS} kerentanan untuk satu IP."
+        )
 
     for item in results:
-        ip_value = item.get("ip")
-        if not isinstance(ip_value, str):
-            raise TenableIntegrationError("Field ip pada respons Tenable tidak valid.")
-        ip = _normalize_ip(ip_value)
-        if ip not in requested_ips:
-            raise TenableIntegrationError(
-                "Tenable mengembalikan vulnerability di luar IP yang diminta."
-            )
-
+        if not isinstance(item, dict):
+            raise TenableIntegrationError("Item vulnerability Tenable tidak valid.")
+        queried_ip = next(
+            (ip for ip in ips if item.get("ip") == ip or item.get("ips")),
+            ips[0] if ips else "",
+        )
+        ip = _record_ip(item, queried_ip)
         try:
             vpr_score = float(item["vprScore"])
         except (KeyError, TypeError, ValueError) as exc:
@@ -332,27 +384,46 @@ def _transform_results(ips: list[str], results: list[dict]) -> dict:
             ) from exc
         if not math.isfinite(vpr_score):
             raise TenableIntegrationError("Field vprScore pada respons Tenable tidak valid.")
-        if vpr_score <= MIN_VPR_SCORE:
-            continue
-
         severity, category = _severity_details(item.get("severity"))
+        plugin_id = _optional_text(item.get("pluginID"), "pluginID")
+        vuln_uuid = _optional_text(item.get("vulnUUID"), "vulnUUID")
+        if not plugin_id:
+            plugin_id = vuln_uuid
+        if not plugin_id:
+            raise TenableIntegrationError(
+                "Respons Tenable tidak memuat pluginID atau vulnUUID untuk kunci kerentanan."
+            )
+        try:
+            cvss_score = item.get("cvssV3BaseScore")
+            epss_score = item.get("epssScore")
+            cvss_score = float(cvss_score) if cvss_score is not None else None
+            epss_score = float(epss_score) if epss_score is not None else None
+        except (TypeError, ValueError) as exc:
+            raise TenableIntegrationError(
+                "Field cvssV3BaseScore atau epssScore pada respons Tenable tidak valid."
+            ) from exc
         vulnerability = {
             "ip": ip,
-            "plugin_id": _optional_text(item.get("pluginID"), "pluginID"),
+            "plugin_id": plugin_id,
             "plugin_name": _optional_text(item.get("pluginName"), "pluginName"),
             "cve": _cve_text(item.get("cve")),
             "vpr_score": vpr_score,
             "severity": severity,
+            "risk_factor": _optional_text(item.get("riskFactor"), "riskFactor"),
+            "cvss_v3_base_score": cvss_score,
+            "epss_score": epss_score,
+            "exploit_available": _json_text(item.get("exploitAvailable"), "exploitAvailable"),
+            "exploit_frameworks": _json_text(item.get("exploitFrameworks"), "exploitFrameworks"),
+            "port": _optional_text(item.get("port"), "port"),
+            "protocol": _optional_text(item.get("protocol"), "protocol"),
+            "dns_name": _optional_text(item.get("dnsName"), "dnsName"),
+            "operating_system": _optional_text(item.get("operatingSystem"), "operatingSystem"),
             "synopsis": _optional_text(item.get("synopsis"), "synopsis"),
+            "description": _optional_text(item.get("description"), "description"),
             "solution": _optional_text(item.get("solution"), "solution"),
+            "vuln_uuid": vuln_uuid,
         }
-        # Keep distinct host/port records while removing repeated page records.
-        key = (
-            tuple(vulnerability[field] for field in vulnerability),
-            _optional_text(item.get("id"), "id"),
-            _optional_text(item.get("port"), "port"),
-            _optional_text(item.get("protocol"), "protocol"),
-        )
+        key = (ip, plugin_id)
         if key in seen:
             continue
         seen.add(key)
@@ -387,11 +458,212 @@ def _transform_results(ips: list[str], results: list[dict]) -> dict:
     }
 
 
+def _initialize_database() -> None:
+    global _database_initialized
+    if _database_initialized:
+        return
+    with _database_lock:
+        if _database_initialized:
+            return
+        database_path = Path(config.TENABLE_DB_PATH)
+        database_path.parent.mkdir(parents=True, exist_ok=True)
+        connection = sqlite3.connect(database_path, timeout=30)
+        try:
+            migration_path = config.PROJECT_ROOT / "migrations" / "002_tenable_vulnerabilities.sql"
+            connection.executescript(migration_path.read_text(encoding="utf-8"))
+            connection.commit()
+        finally:
+            connection.close()
+        _database_initialized = True
+
+
+def _persist_vulnerabilities(records: list[dict]) -> None:
+    if not records:
+        return
+    columns = (
+        "ip", "plugin_id", "plugin_name", "severity", "risk_factor", "vpr_score",
+        "cvss_v3_base_score", "epss_score", "cve", "exploit_available",
+        "exploit_frameworks", "port", "protocol", "dns_name", "operating_system",
+        "synopsis", "description", "solution", "vuln_uuid",
+    )
+    updates = ", ".join(
+        f"{column}=excluded.{column}" for column in columns if column not in {"ip", "plugin_id"}
+    )
+    sql = (
+        f"INSERT INTO tenable_vulnerabilities ({', '.join(columns)}, updated_at) "
+        f"VALUES ({', '.join('?' for _ in columns)}, ?) "
+        f"ON CONFLICT(ip, plugin_id) DO UPDATE SET {updates}, updated_at=excluded.updated_at"
+    )
+    try:
+        _initialize_database()
+        connection = sqlite3.connect(config.TENABLE_DB_PATH, timeout=30)
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            with connection:
+                connection.executemany(
+                    sql,
+                    [tuple(record.get(column) for column in columns) + (now,) for record in records],
+                )
+        finally:
+            connection.close()
+    except (sqlite3.Error, OSError) as exc:
+        logger.exception("Could not save Tenable vulnerability records")
+        raise TenableIntegrationError(
+            "Gagal menyimpan data kerentanan Tenable ke database."
+        ) from exc
+
+
+def _query_persisted_vulnerabilities(records: list[dict]) -> list[dict]:
+    if not records:
+        return []
+    clauses = " OR ".join("(ip=? AND plugin_id=?)" for _ in records)
+    parameters = [value for record in records for value in (record["ip"], record["plugin_id"])]
+    try:
+        _initialize_database()
+        connection = sqlite3.connect(config.TENABLE_DB_PATH, timeout=30)
+        connection.row_factory = sqlite3.Row
+        try:
+            rows = connection.execute(
+                "SELECT ip, plugin_id, plugin_name, severity, vpr_score, cve, "
+                "synopsis, description, solution, ollama_analysis "
+                f"FROM tenable_vulnerabilities WHERE {clauses}",
+                parameters,
+            ).fetchall()
+            return [dict(row) for row in rows]
+        finally:
+            connection.close()
+    except (sqlite3.Error, OSError) as exc:
+        logger.exception("Could not read Tenable vulnerability records")
+        raise TenableIntegrationError(
+            "Gagal membaca kembali data kerentanan Tenable dari database."
+        ) from exc
+
+
+def _save_analysis(ip: str, plugin_id: str, analysis: str) -> None:
+    try:
+        connection = sqlite3.connect(config.TENABLE_DB_PATH, timeout=30)
+        try:
+            with connection:
+                connection.execute(
+                    "UPDATE tenable_vulnerabilities SET ollama_analysis=?, updated_at=? "
+                    "WHERE ip=? AND plugin_id=?",
+                    (analysis, datetime.now(timezone.utc).isoformat(), ip, plugin_id),
+                )
+        finally:
+            connection.close()
+    except (sqlite3.Error, OSError) as exc:
+        logger.exception("Could not cache Ollama Tenable analysis")
+        raise TenableIntegrationError(
+            "Gagal menyimpan hasil analisis Ollama ke database."
+        ) from exc
+
+
+def _analysis_prompt(record: dict) -> str:
+    def value(field: str) -> str:
+        return "" if record.get(field) is None else str(record[field])
+
+    return (
+        "Kamu adalah analis keamanan siber. Analisis kerentanan berikut berdasarkan data Tenable. Gunakan hanya data yang diberikan, jangan mengarang.\n"
+        f"- IP: {value('ip')}\n"
+        f"- Plugin: {value('plugin_name')}\n"
+        f"- VPR Score: {value('vpr_score')} | Severity: {value('severity')}\n"
+        f"- CVE: {value('cve')}\n"
+        f"- Synopsis: {value('synopsis')}\n"
+        f"- Description: {value('description')}\n"
+        f"- Solution: {value('solution')}\n"
+        "Jawab dalam Bahasa Indonesia dengan format:\n"
+        "1. Ringkasan Kerentanan (maks. 2 kalimat)\n"
+        "2. Dampak Potensial terhadap sistem\n"
+        "3. Tingkat Prioritas (Tinggi/Sedang/Rendah) beserta alasannya\n"
+        "4. Rekomendasi Perbaikan (berdasarkan field Solution)"
+    )
+
+
+def _request_ollama_analysis(record: dict) -> str:
+    response = requests.post(
+        f"{config.OLLAMA_URL.rstrip('/')}/api/chat",
+        json={
+            "model": config.OLLAMA_LLM_MODEL,
+            "messages": [{"role": "user", "content": _analysis_prompt(record)}],
+            "stream": False,
+        },
+        headers={"Accept": "application/json", "Content-Type": "application/json"},
+        timeout=(config.OLLAMA_CONNECT_TIMEOUT, config.OLLAMA_READ_TIMEOUT),
+    )
+    if not 200 <= response.status_code < 300:
+        raise OllamaAnalysisError(f"Ollama mengembalikan HTTP {response.status_code}.")
+    try:
+        body = response.json()
+    except ValueError as exc:
+        raise OllamaAnalysisError("Ollama mengembalikan JSON yang tidak valid.") from exc
+    message = body.get("message") if isinstance(body, dict) else None
+    content = message.get("content") if isinstance(message, dict) else None
+    if not isinstance(content, str) or not content.strip():
+        raise OllamaAnalysisError("Ollama tidak mengembalikan teks analisis.")
+    return content.strip()
+
+
+def _analyze_with_ollama(record: dict) -> str:
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            return _request_ollama_analysis(record)
+        except requests.Timeout as exc:
+            last_error = exc
+            logger.warning("Ollama Tenable analysis timed out; attempt=%s/3", attempt + 1)
+        except requests.RequestException as exc:
+            last_error = exc
+            logger.warning(
+                "Ollama Tenable analysis request failed; attempt=%s/3 error=%s",
+                attempt + 1,
+                type(exc).__name__,
+            )
+        except OllamaAnalysisError as exc:
+            last_error = exc
+            logger.warning(
+                "Ollama Tenable analysis failed; attempt=%s/3 error=%s",
+                attempt + 1,
+                str(exc),
+            )
+    if isinstance(last_error, requests.Timeout):
+        raise OllamaAnalysisError(
+            "Ollama timeout setelah 3 percobaan (1 request awal dan 2 retry)."
+        ) from last_error
+    raise OllamaAnalysisError(
+        f"Analisis Ollama gagal setelah 3 percobaan: {last_error or 'kesalahan tidak diketahui'}"
+    ) from last_error
+
+
+def _summaries(ips: list[str], vulnerabilities: list[dict]) -> dict:
+    summaries = {
+        ip: {
+            "ip": ip,
+            "total_findings": 0,
+            "severity_summary": {key: 0 for key in SEVERITY_KEYS},
+        }
+        for ip in ips
+    }
+    overall_severity = {key: 0 for key in SEVERITY_KEYS}
+    for vulnerability in vulnerabilities:
+        summary = summaries[vulnerability["ip"]]
+        summary["total_findings"] += 1
+        _, category = _severity_details(vulnerability.get("severity"))
+        if category is not None:
+            summary["severity_summary"][category] += 1
+            overall_severity[category] += 1
+    return {
+        "ip_summary": list(summaries.values()),
+        "overall_summary": {
+            "total_ips": len(ips),
+            "total_findings": len(vulnerabilities),
+            "severity_summary": overall_severity,
+        },
+    }
+
+
 def get_connection_findings(source_ip: str, destination_ip: str) -> dict:
-    """Ambil seluruh temuan VPR > 8 untuk IP source dan destination."""
-    ips = list(dict.fromkeys(
-        (_normalize_ip(source_ip), _normalize_ip(destination_ip))
-    ))
+    """Ambil, persist, dan analisis 3 temuan VPR teratas per IP dengan Ollama."""
+    ips = [_normalize_ip(source_ip), _normalize_ip(destination_ip)]
     missing = [
         name
         for name, value in (
@@ -413,26 +685,81 @@ def get_connection_findings(source_ip: str, destination_ip: str) -> dict:
         "Accept": "application/json",
         "Content-Type": "application/json",
     }
-    all_results: list[dict] = []
-    offset = 0
+    records: list[dict] = []
 
     session = requests.Session()
     try:
-        while True:
-            payload = _build_payload(ips, offset)
+        for ip in ips:
+            payload = _build_payload(ip)
             page_data = _request_page(session, url, headers, payload)
-            total_records, returned_records, results = _response_page(page_data)
-            all_results.extend(results)
-
-            next_offset = offset + returned_records
-            if next_offset >= total_records:
-                break
-            if returned_records == 0:
-                raise TenableIntegrationError(
-                    "Pagination Tenable tidak membuat kemajuan; hasil tidak lengkap."
-                )
-            offset = next_offset
+            _, _, results = _response_page(page_data)
+            records.extend(_transform_results([ip], results)["vulnerabilities"])
     finally:
         session.close()
 
-    return _transform_results(ips, all_results)
+    unique_records = list({
+        (record["ip"], record["plugin_id"]): record for record in records
+    }.values())
+    unique_records.sort(key=lambda record: record["vpr_score"], reverse=True)
+    _persist_vulnerabilities(unique_records)
+
+    # Analysis inputs are deliberately read back from SQLite, never reused from the API response.
+    persisted = _query_persisted_vulnerabilities(unique_records)
+    persisted.sort(
+        key=lambda record: record["vpr_score"] if record["vpr_score"] is not None else -1,
+        reverse=True,
+    )
+    reports = []
+    for ip in ips:
+        ip_records = [record for record in persisted if record["ip"] == ip]
+        if not ip_records:
+            reports.append({
+                "ip": ip,
+                "message": "Tidak ada kerentanan VPR 8.1-10 yang ditemukan",
+                "vulnerabilities": [],
+            })
+            continue
+        reported_vulnerabilities = []
+        for record in ip_records:
+            analysis = record["ollama_analysis"]
+            error = None
+            if not analysis:
+                try:
+                    analysis = _analyze_with_ollama(record)
+                    _save_analysis(record["ip"], record["plugin_id"], analysis)
+                except OllamaAnalysisError as exc:
+                    error = str(exc)
+            reported_vulnerabilities.append({
+                **{key: value for key, value in record.items() if key != "ollama_analysis"},
+                "ollama_analysis": analysis,
+                "ollama_error": error,
+            })
+        reports.append({
+            "ip": ip,
+            "vulnerabilities": reported_vulnerabilities,
+        })
+
+    summaries = _summaries(ips, unique_records)
+    analysis_errors = [
+        item["ollama_error"]
+        for report in reports
+        for item in report.get("vulnerabilities", [])
+        if item.get("ollama_error")
+    ]
+    return {
+        **summaries,
+        "vulnerabilities": [
+            item
+            for report in reports
+            for item in report.get("vulnerabilities", [])
+        ],
+        "ip_reports": reports,
+        "analysis_status": (
+            "failed" if analysis_errors and not any(
+                item.get("ollama_analysis")
+                for report in reports
+                for item in report.get("vulnerabilities", [])
+            ) else "partial" if analysis_errors else "success"
+        ),
+        "analysis_errors": analysis_errors,
+    }

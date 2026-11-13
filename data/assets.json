@@ -1065,7 +1065,7 @@
   },
   {
     "asset_id": "A077",
-    "ip": "192.168.77.40",
+    "ip": "192.168.223.65",
     "hostname": "srv-core-db08",
     "application": "Core Banking",
     "environment": "PROD",
@@ -1079,7 +1079,7 @@
   },
   {
     "asset_id": "A078",
-    "ip": "192.168.78.47",
+    "ip": "192.168.168.205",
     "hostname": "srv-portal-app08",
     "application": "Customer Portal",
     "environment": "PROD",

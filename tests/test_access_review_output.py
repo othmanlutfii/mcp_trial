@@ -249,6 +249,7 @@ class AccessReviewOutputTests(unittest.TestCase):
                     "severity": "Medium",
                     "vpr_score": 8.7,
                     "plugin_name": "TENABLE_PRIVATE_FINDING",
+                    "ollama_analysis": "Generated Tenable analysis.",
                 }
             ]
         }
@@ -278,8 +279,12 @@ class AccessReviewOutputTests(unittest.TestCase):
                     access_agents,
                     "_run",
                     return_value=[SimpleNamespace(content="Gunakan aturan P-2.")],
-                ), redirect_stdout(stdout):
-                    access_agents.review_access(
+                ), patch.object(
+                    access_agents,
+                    "_generate_ollama_executive_summary",
+                    return_value="Ringkasan dari Ollama.",
+                ) as summary_step, redirect_stdout(stdout):
+                    answer = access_agents.review_access(
                         "192.0.2.10",
                         "192.0.2.20",
                         443,
@@ -290,12 +295,162 @@ class AccessReviewOutputTests(unittest.TestCase):
                 reviewer_input = llm.messages[1][1]
                 self.assertNotIn("finding_va", reviewer_input)
                 self.assertNotIn("TENABLE_PRIVATE_ERROR", reviewer_input)
+                self.assertIn("Vulnerability dan SLA", answer)
+                self.assertIn("Source (192.0.2.10): severity tidak ada data; SLA ", answer)
+                self.assertIn("Executive Summary\nRingkasan dari Ollama.", answer)
+                summary_step.assert_called_once()
                 if verbose:
                     self.assertIn("[Finding VA Tenable]", stdout.getvalue())
                     self.assertIn("TENABLE_PRIVATE_ERROR", stdout.getvalue())
                 else:
                     self.assertNotIn("Finding VA Tenable", stdout.getvalue())
                     self.assertNotIn("TENABLE_PRIVATE_ERROR", stdout.getvalue())
+
+    def test_vulnerability_sla_section_uses_only_successful_ollama_va_analysis(self):
+        data = _assessment_data()
+        data["source"].update(
+            {
+                "ip": "192.168.223.65",
+                "asset_type": "server",
+                "environment": "PROD",
+                "ip_category": "internal",
+            }
+        )
+        data["destination"].update(
+            {
+                "ip": "192.168.168.205",
+                "asset_type": "server",
+                "environment": "PROD",
+                "ip_category": "internal",
+            }
+        )
+        data["finding_va_status"] = "success"
+        data["finding_va"] = {
+            "ip_reports": [
+                {
+                    "ip": "192.168.223.65",
+                    "vulnerabilities": [
+                        {
+                            "severity": "High",
+                            "ollama_analysis": "Prioritas tinggi; ikuti solusi Tenable.",
+                        }
+                    ],
+                },
+                {
+                    "ip": "192.168.168.205",
+                    "vulnerabilities": [
+                        {
+                            "severity": "Critical",
+                            "ollama_analysis": "Prioritas tinggi; ikuti solusi Tenable.",
+                        }
+                    ],
+                },
+            ]
+        }
+
+        section = access_agents._vulnerability_sla_section(data)
+
+        self.assertEqual(
+            section,
+            "Vulnerability dan SLA\n"
+            "Source (192.168.223.65): severity High; SLA 14 hari "
+            "(High PROD, prioritas 3)\n"
+            "Destination (192.168.168.205): severity Critical; SLA 7 hari "
+            "(Critical PROD, prioritas 2)",
+        )
+
+    def test_vulnerability_sla_section_uses_exact_no_data_wording_without_ollama_findings(self):
+        data = _assessment_data()
+        data["source"]["ip"] = "192.168.223.65"
+        data["destination"]["ip"] = "192.168.168.205"
+        data["finding_va_status"] = "success"
+        data["finding_va"] = {
+            "ip_reports": [
+                {"ip": "192.168.223.65", "vulnerabilities": []},
+                {"ip": "192.168.168.205", "vulnerabilities": []},
+            ]
+        }
+
+        self.assertEqual(
+            access_agents._vulnerability_sla_section(data),
+            "Vulnerability dan SLA\n"
+            "Source (192.168.223.65): severity tidak ada data; SLA "
+            "Tidak ada SLA remediasi yang dihitung untuk sisi ini.\n"
+            "Destination (192.168.168.205): severity tidak ada data; SLA "
+            "Tidak ada SLA remediasi yang dihitung untuk sisi ini.",
+        )
+
+    def test_reviewer_vulnerability_section_is_replaced_with_ollama_backed_values(self):
+        reviewer_result = (
+            "Keputusan: REVIEW_REQUIRED\n\n"
+            "Vulnerability dan SLA\n"
+            "Source (192.0.2.10): severity High; SLA dibuat-buat\n"
+            "Destination (192.0.2.20): severity Critical; SLA dibuat-buat\n\n"
+            "Aturan akses: P-2."
+        )
+        section = access_agents._vulnerability_sla_section(_assessment_data())
+
+        updated = access_agents._replace_vulnerability_sla(reviewer_result, section)
+
+        self.assertIn(
+            "Vulnerability dan SLA\nSource (192.0.2.10): severity tidak ada data",
+            updated,
+        )
+        self.assertNotIn("SLA dibuat-buat", updated)
+        self.assertIn("Aturan akses: P-2.", updated)
+
+    def test_executive_summary_step_sends_ollama_va_analysis_to_ollama(self):
+        data = _assessment_data()
+        data["finding_va_status"] = "success"
+        data["finding_va"] = {
+            "ip_reports": [
+                {
+                    "ip": "192.0.2.10",
+                    "vulnerabilities": [
+                        {
+                            "severity": "High",
+                            "ollama_analysis": "Prioritas Tinggi berdasarkan Solution.",
+                        }
+                    ],
+                }
+            ]
+        }
+        response = SimpleNamespace(
+            status_code=200,
+            json=lambda: {"message": {"content": "Ringkasan dari Ollama."}},
+        )
+        with patch.object(access_agents.config, "OLLAMA_URL", "http://ollama.example"), patch.object(
+            access_agents.config, "OLLAMA_LLM_MODEL", "test-model"
+        ), patch.object(access_agents.requests, "post", return_value=response) as post:
+            summary = access_agents._generate_ollama_executive_summary(
+                "Keputusan: REVIEW_REQUIRED",
+                data,
+                "Aturan P-2.",
+                access_agents._vulnerability_sla_section(data),
+            )
+
+        self.assertEqual(summary, "Ringkasan dari Ollama.")
+        self.assertEqual(post.call_args.args[0], "http://ollama.example/api/chat")
+        prompt = post.call_args.kwargs["json"]["messages"][1]["content"]
+        self.assertIn("Prioritas Tinggi berdasarkan Solution.", prompt)
+        self.assertEqual(post.call_args.kwargs["json"]["model"], "test-model")
+
+    def test_executive_summary_ollama_failure_is_reported_after_two_retries(self):
+        with patch.object(
+            access_agents.requests, "post", side_effect=access_agents.requests.Timeout
+        ) as post:
+            with self.assertRaisesRegex(
+                access_agents.OllamaExecutiveSummaryError,
+                "1 request awal dan 2 retry",
+            ):
+                access_agents._generate_ollama_executive_summary(
+                    "Keputusan: REVIEW_REQUIRED",
+                    _assessment_data(),
+                    "Aturan P-2.",
+                    access_agents._vulnerability_sla_section(_assessment_data()),
+                )
+
+        self.assertEqual(post.call_count, 3)
 
     def test_web_answer_removes_markdown_decoration_and_normalizes_bullets(self):
         answer = (
